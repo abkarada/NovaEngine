@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/ryuzaki/Desktop/NovaEngine
+CMAKE_SOURCE_DIR = /home/raulcto/CLionProjects/Nova_Engine_V3
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/ryuzaki/Desktop/NovaEngine/build
+CMAKE_BINARY_DIR = /home/raulcto/CLionProjects/Nova_Engine_V3/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles /home/ryuzaki/Desktop/NovaEngine/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/raulcto/CLionProjects/Nova_Engine_V3/build/CMakeFiles /home/raulcto/CLionProjects/Nova_Engine_V3/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/raulcto/CLionProjects/Nova_Engine_V3/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -117,257 +117,421 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named novaengine
+# Target rules for targets named nova_engine
 
 # Build rule for target.
-novaengine: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 novaengine
-.PHONY : novaengine
+nova_engine: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 nova_engine
+.PHONY : nova_engine
 
 # fast build rule for target.
-novaengine/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/build
-.PHONY : novaengine/fast
+nova_engine/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/build
+.PHONY : nova_engine/fast
 
-src/decode_and_display.o: src/decode_and_display.cpp.o
-.PHONY : src/decode_and_display.o
+#=============================================================================
+# Target rules for targets named nova_engine_friend
 
-# target to build an object file
-src/decode_and_display.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/decode_and_display.cpp.o
-.PHONY : src/decode_and_display.cpp.o
+# Build rule for target.
+nova_engine_friend: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 nova_engine_friend
+.PHONY : nova_engine_friend
 
-src/decode_and_display.i: src/decode_and_display.cpp.i
-.PHONY : src/decode_and_display.i
+# fast build rule for target.
+nova_engine_friend/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/build
+.PHONY : nova_engine_friend/fast
 
-# target to preprocess a source file
-src/decode_and_display.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/decode_and_display.cpp.i
-.PHONY : src/decode_and_display.cpp.i
+#=============================================================================
+# Target rules for targets named udp_test
 
-src/decode_and_display.s: src/decode_and_display.cpp.s
-.PHONY : src/decode_and_display.s
+# Build rule for target.
+udp_test: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 udp_test
+.PHONY : udp_test
 
-# target to generate assembly for a file
-src/decode_and_display.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/decode_and_display.cpp.s
-.PHONY : src/decode_and_display.cpp.s
+# fast build rule for target.
+udp_test/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/udp_test.dir/build.make CMakeFiles/udp_test.dir/build
+.PHONY : udp_test/fast
 
-src/erasure_coder.o: src/erasure_coder.cpp.o
-.PHONY : src/erasure_coder.o
+#=============================================================================
+# Target rules for targets named udp_test_friend
 
-# target to build an object file
-src/erasure_coder.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/erasure_coder.cpp.o
-.PHONY : src/erasure_coder.cpp.o
+# Build rule for target.
+udp_test_friend: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 udp_test_friend
+.PHONY : udp_test_friend
 
-src/erasure_coder.i: src/erasure_coder.cpp.i
-.PHONY : src/erasure_coder.i
+# fast build rule for target.
+udp_test_friend/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/udp_test_friend.dir/build.make CMakeFiles/udp_test_friend.dir/build
+.PHONY : udp_test_friend/fast
 
-# target to preprocess a source file
-src/erasure_coder.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/erasure_coder.cpp.i
-.PHONY : src/erasure_coder.cpp.i
+#=============================================================================
+# Target rules for targets named udp_chat
 
-src/erasure_coder.s: src/erasure_coder.cpp.s
-.PHONY : src/erasure_coder.s
+# Build rule for target.
+udp_chat: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 udp_chat
+.PHONY : udp_chat
 
-# target to generate assembly for a file
-src/erasure_coder.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/erasure_coder.cpp.s
-.PHONY : src/erasure_coder.cpp.s
+# fast build rule for target.
+udp_chat/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/udp_chat.dir/build.make CMakeFiles/udp_chat.dir/build
+.PHONY : udp_chat/fast
 
-src/ffmpeg_encoder.o: src/ffmpeg_encoder.cpp.o
-.PHONY : src/ffmpeg_encoder.o
+#=============================================================================
+# Target rules for targets named video_chat
 
-# target to build an object file
-src/ffmpeg_encoder.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/ffmpeg_encoder.cpp.o
-.PHONY : src/ffmpeg_encoder.cpp.o
+# Build rule for target.
+video_chat: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 video_chat
+.PHONY : video_chat
 
-src/ffmpeg_encoder.i: src/ffmpeg_encoder.cpp.i
-.PHONY : src/ffmpeg_encoder.i
+# fast build rule for target.
+video_chat/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/video_chat.dir/build.make CMakeFiles/video_chat.dir/build
+.PHONY : video_chat/fast
 
-# target to preprocess a source file
-src/ffmpeg_encoder.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/ffmpeg_encoder.cpp.i
-.PHONY : src/ffmpeg_encoder.cpp.i
-
-src/ffmpeg_encoder.s: src/ffmpeg_encoder.cpp.s
-.PHONY : src/ffmpeg_encoder.s
-
-# target to generate assembly for a file
-src/ffmpeg_encoder.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/ffmpeg_encoder.cpp.s
-.PHONY : src/ffmpeg_encoder.cpp.s
-
-src/main.o: src/main.cpp.o
-.PHONY : src/main.o
+src/core/engine.o: src/core/engine.cpp.o
+.PHONY : src/core/engine.o
 
 # target to build an object file
-src/main.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/main.cpp.o
-.PHONY : src/main.cpp.o
+src/core/engine.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/src/core/engine.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/src/core/engine.cpp.o
+.PHONY : src/core/engine.cpp.o
 
-src/main.i: src/main.cpp.i
-.PHONY : src/main.i
+src/core/engine.i: src/core/engine.cpp.i
+.PHONY : src/core/engine.i
 
 # target to preprocess a source file
-src/main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/main.cpp.i
-.PHONY : src/main.cpp.i
+src/core/engine.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/src/core/engine.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/src/core/engine.cpp.i
+.PHONY : src/core/engine.cpp.i
 
-src/main.s: src/main.cpp.s
-.PHONY : src/main.s
+src/core/engine.s: src/core/engine.cpp.s
+.PHONY : src/core/engine.s
 
 # target to generate assembly for a file
-src/main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/main.cpp.s
-.PHONY : src/main.cpp.s
+src/core/engine.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/src/core/engine.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/src/core/engine.cpp.s
+.PHONY : src/core/engine.cpp.s
 
-src/network_monitor.o: src/network_monitor.cpp.o
-.PHONY : src/network_monitor.o
+src/core/main.o: src/core/main.cpp.o
+.PHONY : src/core/main.o
 
 # target to build an object file
-src/network_monitor.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/network_monitor.cpp.o
-.PHONY : src/network_monitor.cpp.o
+src/core/main.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/src/core/main.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/video_chat.dir/build.make CMakeFiles/video_chat.dir/src/core/main.cpp.o
+.PHONY : src/core/main.cpp.o
 
-src/network_monitor.i: src/network_monitor.cpp.i
-.PHONY : src/network_monitor.i
+src/core/main.i: src/core/main.cpp.i
+.PHONY : src/core/main.i
 
 # target to preprocess a source file
-src/network_monitor.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/network_monitor.cpp.i
-.PHONY : src/network_monitor.cpp.i
+src/core/main.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/src/core/main.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/video_chat.dir/build.make CMakeFiles/video_chat.dir/src/core/main.cpp.i
+.PHONY : src/core/main.cpp.i
 
-src/network_monitor.s: src/network_monitor.cpp.s
-.PHONY : src/network_monitor.s
+src/core/main.s: src/core/main.cpp.s
+.PHONY : src/core/main.s
 
 # target to generate assembly for a file
-src/network_monitor.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/network_monitor.cpp.s
-.PHONY : src/network_monitor.cpp.s
+src/core/main.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/src/core/main.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/video_chat.dir/build.make CMakeFiles/video_chat.dir/src/core/main.cpp.s
+.PHONY : src/core/main.cpp.s
 
-src/scheduler.o: src/scheduler.cpp.o
-.PHONY : src/scheduler.o
+src/core/main_friend.o: src/core/main_friend.cpp.o
+.PHONY : src/core/main_friend.o
 
 # target to build an object file
-src/scheduler.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/scheduler.cpp.o
-.PHONY : src/scheduler.cpp.o
+src/core/main_friend.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/src/core/main_friend.cpp.o
+.PHONY : src/core/main_friend.cpp.o
 
-src/scheduler.i: src/scheduler.cpp.i
-.PHONY : src/scheduler.i
+src/core/main_friend.i: src/core/main_friend.cpp.i
+.PHONY : src/core/main_friend.i
 
 # target to preprocess a source file
-src/scheduler.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/scheduler.cpp.i
-.PHONY : src/scheduler.cpp.i
+src/core/main_friend.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/src/core/main_friend.cpp.i
+.PHONY : src/core/main_friend.cpp.i
 
-src/scheduler.s: src/scheduler.cpp.s
-.PHONY : src/scheduler.s
+src/core/main_friend.s: src/core/main_friend.cpp.s
+.PHONY : src/core/main_friend.s
 
 # target to generate assembly for a file
-src/scheduler.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/scheduler.cpp.s
-.PHONY : src/scheduler.cpp.s
+src/core/main_friend.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/src/core/main_friend.cpp.s
+.PHONY : src/core/main_friend.cpp.s
 
-src/sender_receiver.o: src/sender_receiver.cpp.o
-.PHONY : src/sender_receiver.o
+src/core/udp_chat.o: src/core/udp_chat.cpp.o
+.PHONY : src/core/udp_chat.o
 
 # target to build an object file
-src/sender_receiver.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/sender_receiver.cpp.o
-.PHONY : src/sender_receiver.cpp.o
+src/core/udp_chat.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/udp_chat.dir/build.make CMakeFiles/udp_chat.dir/src/core/udp_chat.cpp.o
+.PHONY : src/core/udp_chat.cpp.o
 
-src/sender_receiver.i: src/sender_receiver.cpp.i
-.PHONY : src/sender_receiver.i
+src/core/udp_chat.i: src/core/udp_chat.cpp.i
+.PHONY : src/core/udp_chat.i
 
 # target to preprocess a source file
-src/sender_receiver.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/sender_receiver.cpp.i
-.PHONY : src/sender_receiver.cpp.i
+src/core/udp_chat.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/udp_chat.dir/build.make CMakeFiles/udp_chat.dir/src/core/udp_chat.cpp.i
+.PHONY : src/core/udp_chat.cpp.i
 
-src/sender_receiver.s: src/sender_receiver.cpp.s
-.PHONY : src/sender_receiver.s
+src/core/udp_chat.s: src/core/udp_chat.cpp.s
+.PHONY : src/core/udp_chat.s
 
 # target to generate assembly for a file
-src/sender_receiver.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/sender_receiver.cpp.s
-.PHONY : src/sender_receiver.cpp.s
+src/core/udp_chat.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/udp_chat.dir/build.make CMakeFiles/udp_chat.dir/src/core/udp_chat.cpp.s
+.PHONY : src/core/udp_chat.cpp.s
 
-src/slicer.o: src/slicer.cpp.o
-.PHONY : src/slicer.o
+src/core/udp_test.o: src/core/udp_test.cpp.o
+.PHONY : src/core/udp_test.o
 
 # target to build an object file
-src/slicer.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/slicer.cpp.o
-.PHONY : src/slicer.cpp.o
+src/core/udp_test.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/udp_test.dir/build.make CMakeFiles/udp_test.dir/src/core/udp_test.cpp.o
+.PHONY : src/core/udp_test.cpp.o
 
-src/slicer.i: src/slicer.cpp.i
-.PHONY : src/slicer.i
+src/core/udp_test.i: src/core/udp_test.cpp.i
+.PHONY : src/core/udp_test.i
 
 # target to preprocess a source file
-src/slicer.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/slicer.cpp.i
-.PHONY : src/slicer.cpp.i
+src/core/udp_test.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/udp_test.dir/build.make CMakeFiles/udp_test.dir/src/core/udp_test.cpp.i
+.PHONY : src/core/udp_test.cpp.i
 
-src/slicer.s: src/slicer.cpp.s
-.PHONY : src/slicer.s
+src/core/udp_test.s: src/core/udp_test.cpp.s
+.PHONY : src/core/udp_test.s
 
 # target to generate assembly for a file
-src/slicer.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/slicer.cpp.s
-.PHONY : src/slicer.cpp.s
+src/core/udp_test.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/udp_test.dir/build.make CMakeFiles/udp_test.dir/src/core/udp_test.cpp.s
+.PHONY : src/core/udp_test.cpp.s
 
-src/smart_collector.o: src/smart_collector.cpp.o
-.PHONY : src/smart_collector.o
+src/core/udp_test_friend.o: src/core/udp_test_friend.cpp.o
+.PHONY : src/core/udp_test_friend.o
 
 # target to build an object file
-src/smart_collector.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/smart_collector.cpp.o
-.PHONY : src/smart_collector.cpp.o
+src/core/udp_test_friend.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/udp_test_friend.dir/build.make CMakeFiles/udp_test_friend.dir/src/core/udp_test_friend.cpp.o
+.PHONY : src/core/udp_test_friend.cpp.o
 
-src/smart_collector.i: src/smart_collector.cpp.i
-.PHONY : src/smart_collector.i
+src/core/udp_test_friend.i: src/core/udp_test_friend.cpp.i
+.PHONY : src/core/udp_test_friend.i
 
 # target to preprocess a source file
-src/smart_collector.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/smart_collector.cpp.i
-.PHONY : src/smart_collector.cpp.i
+src/core/udp_test_friend.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/udp_test_friend.dir/build.make CMakeFiles/udp_test_friend.dir/src/core/udp_test_friend.cpp.i
+.PHONY : src/core/udp_test_friend.cpp.i
 
-src/smart_collector.s: src/smart_collector.cpp.s
-.PHONY : src/smart_collector.s
+src/core/udp_test_friend.s: src/core/udp_test_friend.cpp.s
+.PHONY : src/core/udp_test_friend.s
 
 # target to generate assembly for a file
-src/smart_collector.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/smart_collector.cpp.s
-.PHONY : src/smart_collector.cpp.s
+src/core/udp_test_friend.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/udp_test_friend.dir/build.make CMakeFiles/udp_test_friend.dir/src/core/udp_test_friend.cpp.s
+.PHONY : src/core/udp_test_friend.cpp.s
 
-src/udp_sender.o: src/udp_sender.cpp.o
-.PHONY : src/udp_sender.o
+src/media/erasure_coder.o: src/media/erasure_coder.cpp.o
+.PHONY : src/media/erasure_coder.o
 
 # target to build an object file
-src/udp_sender.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/udp_sender.cpp.o
-.PHONY : src/udp_sender.cpp.o
+src/media/erasure_coder.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/src/media/erasure_coder.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/src/media/erasure_coder.cpp.o
+.PHONY : src/media/erasure_coder.cpp.o
 
-src/udp_sender.i: src/udp_sender.cpp.i
-.PHONY : src/udp_sender.i
+src/media/erasure_coder.i: src/media/erasure_coder.cpp.i
+.PHONY : src/media/erasure_coder.i
 
 # target to preprocess a source file
-src/udp_sender.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/udp_sender.cpp.i
-.PHONY : src/udp_sender.cpp.i
+src/media/erasure_coder.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/src/media/erasure_coder.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/src/media/erasure_coder.cpp.i
+.PHONY : src/media/erasure_coder.cpp.i
 
-src/udp_sender.s: src/udp_sender.cpp.s
-.PHONY : src/udp_sender.s
+src/media/erasure_coder.s: src/media/erasure_coder.cpp.s
+.PHONY : src/media/erasure_coder.s
 
 # target to generate assembly for a file
-src/udp_sender.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/udp_sender.cpp.s
-.PHONY : src/udp_sender.cpp.s
+src/media/erasure_coder.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/src/media/erasure_coder.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/src/media/erasure_coder.cpp.s
+.PHONY : src/media/erasure_coder.cpp.s
+
+src/media/ffmpeg_encoder.o: src/media/ffmpeg_encoder.cpp.o
+.PHONY : src/media/ffmpeg_encoder.o
+
+# target to build an object file
+src/media/ffmpeg_encoder.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/src/media/ffmpeg_encoder.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/src/media/ffmpeg_encoder.cpp.o
+.PHONY : src/media/ffmpeg_encoder.cpp.o
+
+src/media/ffmpeg_encoder.i: src/media/ffmpeg_encoder.cpp.i
+.PHONY : src/media/ffmpeg_encoder.i
+
+# target to preprocess a source file
+src/media/ffmpeg_encoder.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/src/media/ffmpeg_encoder.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/src/media/ffmpeg_encoder.cpp.i
+.PHONY : src/media/ffmpeg_encoder.cpp.i
+
+src/media/ffmpeg_encoder.s: src/media/ffmpeg_encoder.cpp.s
+.PHONY : src/media/ffmpeg_encoder.s
+
+# target to generate assembly for a file
+src/media/ffmpeg_encoder.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/src/media/ffmpeg_encoder.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/src/media/ffmpeg_encoder.cpp.s
+.PHONY : src/media/ffmpeg_encoder.cpp.s
+
+src/media/slicer.o: src/media/slicer.cpp.o
+.PHONY : src/media/slicer.o
+
+# target to build an object file
+src/media/slicer.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/src/media/slicer.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/src/media/slicer.cpp.o
+.PHONY : src/media/slicer.cpp.o
+
+src/media/slicer.i: src/media/slicer.cpp.i
+.PHONY : src/media/slicer.i
+
+# target to preprocess a source file
+src/media/slicer.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/src/media/slicer.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/src/media/slicer.cpp.i
+.PHONY : src/media/slicer.cpp.i
+
+src/media/slicer.s: src/media/slicer.cpp.s
+.PHONY : src/media/slicer.s
+
+# target to generate assembly for a file
+src/media/slicer.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/src/media/slicer.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/src/media/slicer.cpp.s
+.PHONY : src/media/slicer.cpp.s
+
+src/network/path_monitor.o: src/network/path_monitor.cpp.o
+.PHONY : src/network/path_monitor.o
+
+# target to build an object file
+src/network/path_monitor.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/src/network/path_monitor.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/src/network/path_monitor.cpp.o
+.PHONY : src/network/path_monitor.cpp.o
+
+src/network/path_monitor.i: src/network/path_monitor.cpp.i
+.PHONY : src/network/path_monitor.i
+
+# target to preprocess a source file
+src/network/path_monitor.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/src/network/path_monitor.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/src/network/path_monitor.cpp.i
+.PHONY : src/network/path_monitor.cpp.i
+
+src/network/path_monitor.s: src/network/path_monitor.cpp.s
+.PHONY : src/network/path_monitor.s
+
+# target to generate assembly for a file
+src/network/path_monitor.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/src/network/path_monitor.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/src/network/path_monitor.cpp.s
+.PHONY : src/network/path_monitor.cpp.s
+
+src/network/scheduler.o: src/network/scheduler.cpp.o
+.PHONY : src/network/scheduler.o
+
+# target to build an object file
+src/network/scheduler.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/src/network/scheduler.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/src/network/scheduler.cpp.o
+.PHONY : src/network/scheduler.cpp.o
+
+src/network/scheduler.i: src/network/scheduler.cpp.i
+.PHONY : src/network/scheduler.i
+
+# target to preprocess a source file
+src/network/scheduler.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/src/network/scheduler.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/src/network/scheduler.cpp.i
+.PHONY : src/network/scheduler.cpp.i
+
+src/network/scheduler.s: src/network/scheduler.cpp.s
+.PHONY : src/network/scheduler.s
+
+# target to generate assembly for a file
+src/network/scheduler.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/src/network/scheduler.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/src/network/scheduler.cpp.s
+.PHONY : src/network/scheduler.cpp.s
+
+src/network/sender_receiver.o: src/network/sender_receiver.cpp.o
+.PHONY : src/network/sender_receiver.o
+
+# target to build an object file
+src/network/sender_receiver.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/src/network/sender_receiver.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/src/network/sender_receiver.cpp.o
+.PHONY : src/network/sender_receiver.cpp.o
+
+src/network/sender_receiver.i: src/network/sender_receiver.cpp.i
+.PHONY : src/network/sender_receiver.i
+
+# target to preprocess a source file
+src/network/sender_receiver.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/src/network/sender_receiver.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/src/network/sender_receiver.cpp.i
+.PHONY : src/network/sender_receiver.cpp.i
+
+src/network/sender_receiver.s: src/network/sender_receiver.cpp.s
+.PHONY : src/network/sender_receiver.s
+
+# target to generate assembly for a file
+src/network/sender_receiver.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/src/network/sender_receiver.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/src/network/sender_receiver.cpp.s
+.PHONY : src/network/sender_receiver.cpp.s
+
+src/transport/smart_collector.o: src/transport/smart_collector.cpp.o
+.PHONY : src/transport/smart_collector.o
+
+# target to build an object file
+src/transport/smart_collector.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/src/transport/smart_collector.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/src/transport/smart_collector.cpp.o
+.PHONY : src/transport/smart_collector.cpp.o
+
+src/transport/smart_collector.i: src/transport/smart_collector.cpp.i
+.PHONY : src/transport/smart_collector.i
+
+# target to preprocess a source file
+src/transport/smart_collector.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/src/transport/smart_collector.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/src/transport/smart_collector.cpp.i
+.PHONY : src/transport/smart_collector.cpp.i
+
+src/transport/smart_collector.s: src/transport/smart_collector.cpp.s
+.PHONY : src/transport/smart_collector.s
+
+# target to generate assembly for a file
+src/transport/smart_collector.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/src/transport/smart_collector.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/src/transport/smart_collector.cpp.s
+.PHONY : src/transport/smart_collector.cpp.s
 
 # Help Target
 help:
@@ -377,37 +541,51 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... novaengine"
-	@echo "... src/decode_and_display.o"
-	@echo "... src/decode_and_display.i"
-	@echo "... src/decode_and_display.s"
-	@echo "... src/erasure_coder.o"
-	@echo "... src/erasure_coder.i"
-	@echo "... src/erasure_coder.s"
-	@echo "... src/ffmpeg_encoder.o"
-	@echo "... src/ffmpeg_encoder.i"
-	@echo "... src/ffmpeg_encoder.s"
-	@echo "... src/main.o"
-	@echo "... src/main.i"
-	@echo "... src/main.s"
-	@echo "... src/network_monitor.o"
-	@echo "... src/network_monitor.i"
-	@echo "... src/network_monitor.s"
-	@echo "... src/scheduler.o"
-	@echo "... src/scheduler.i"
-	@echo "... src/scheduler.s"
-	@echo "... src/sender_receiver.o"
-	@echo "... src/sender_receiver.i"
-	@echo "... src/sender_receiver.s"
-	@echo "... src/slicer.o"
-	@echo "... src/slicer.i"
-	@echo "... src/slicer.s"
-	@echo "... src/smart_collector.o"
-	@echo "... src/smart_collector.i"
-	@echo "... src/smart_collector.s"
-	@echo "... src/udp_sender.o"
-	@echo "... src/udp_sender.i"
-	@echo "... src/udp_sender.s"
+	@echo "... nova_engine"
+	@echo "... nova_engine_friend"
+	@echo "... udp_chat"
+	@echo "... udp_test"
+	@echo "... udp_test_friend"
+	@echo "... video_chat"
+	@echo "... src/core/engine.o"
+	@echo "... src/core/engine.i"
+	@echo "... src/core/engine.s"
+	@echo "... src/core/main.o"
+	@echo "... src/core/main.i"
+	@echo "... src/core/main.s"
+	@echo "... src/core/main_friend.o"
+	@echo "... src/core/main_friend.i"
+	@echo "... src/core/main_friend.s"
+	@echo "... src/core/udp_chat.o"
+	@echo "... src/core/udp_chat.i"
+	@echo "... src/core/udp_chat.s"
+	@echo "... src/core/udp_test.o"
+	@echo "... src/core/udp_test.i"
+	@echo "... src/core/udp_test.s"
+	@echo "... src/core/udp_test_friend.o"
+	@echo "... src/core/udp_test_friend.i"
+	@echo "... src/core/udp_test_friend.s"
+	@echo "... src/media/erasure_coder.o"
+	@echo "... src/media/erasure_coder.i"
+	@echo "... src/media/erasure_coder.s"
+	@echo "... src/media/ffmpeg_encoder.o"
+	@echo "... src/media/ffmpeg_encoder.i"
+	@echo "... src/media/ffmpeg_encoder.s"
+	@echo "... src/media/slicer.o"
+	@echo "... src/media/slicer.i"
+	@echo "... src/media/slicer.s"
+	@echo "... src/network/path_monitor.o"
+	@echo "... src/network/path_monitor.i"
+	@echo "... src/network/path_monitor.s"
+	@echo "... src/network/scheduler.o"
+	@echo "... src/network/scheduler.i"
+	@echo "... src/network/scheduler.s"
+	@echo "... src/network/sender_receiver.o"
+	@echo "... src/network/sender_receiver.i"
+	@echo "... src/network/sender_receiver.s"
+	@echo "... src/transport/smart_collector.o"
+	@echo "... src/transport/smart_collector.i"
+	@echo "... src/transport/smart_collector.s"
 .PHONY : help
 
 

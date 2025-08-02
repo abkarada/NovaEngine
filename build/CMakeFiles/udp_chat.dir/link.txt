@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/udp_chat.dir/src/core/udp_chat.cpp.o -o udp_chat  -lpthread 
