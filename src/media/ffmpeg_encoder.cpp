@@ -56,7 +56,7 @@ void FFmpegEncoder::openCodec(int width, int height, int fps, int bitrate_kbps) 
     codec_ctx_->pix_fmt = AV_PIX_FMT_YUV420P;
 
     // Netflix-quality and low-latency settings
-    av_opt_set(codec_ctx_->priv_data, "preset", "superfast", 0);
+    av_opt_set(codec_ctx_->priv_data, "preset", "veryfast", 0);
     av_opt_set(codec_ctx_->priv_data, "tune", "film", 0);
     av_opt_set(codec_ctx_->priv_data, "threads", "auto", 0); // Multi-threading
 
