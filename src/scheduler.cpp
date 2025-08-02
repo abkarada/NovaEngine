@@ -104,7 +104,9 @@ void AdaptiveScheduler::rebuildWeightTable() {
     total_weight_ = 0;
     
     for (const auto& path : paths_) {
-        total_weight_ += path.weight;
+        // Prevent overflow by limiting weight
+        int weight = std::min(path.weight, 1000);
+        total_weight_ += weight;
         cumulative_weights_.push_back(total_weight_);
     }
     
@@ -144,8 +146,8 @@ int AdaptiveScheduler::calculateWeight(double rtt_ms, double loss_ratio) const {
     // Combined weight with minimum threshold
     double weight = rtt_weight * loss_penalty;
     
-    // Ensure minimum weight of 1
-    return std::max(1, static_cast<int>(weight));
+    // Ensure weight is within reasonable bounds (1-1000)
+    return std::max(1, std::min(1000, static_cast<int>(weight)));
 }
 
 void AdaptiveScheduler::updateStatistics() {

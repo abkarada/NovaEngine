@@ -270,7 +270,7 @@ bool FFmpegEncoder::convertFrame(const cv::Mat& bgrFrame) {
     
     // Prepare source data
     uint8_t* src_data[4] = {const_cast<uint8_t*>(bgrFrame.data), nullptr, nullptr, nullptr};
-    int src_linesize[4] = {bgrFrame.step, 0, 0, 0};
+    int src_linesize[4] = {static_cast<int>(bgrFrame.step), 0, 0, 0};
     
     // Convert BGR to YUV420P
     int ret = sws_scale(swsCtx_, src_data, src_linesize, 0, current_height_,

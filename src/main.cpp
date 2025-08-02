@@ -5,6 +5,7 @@
 #include <atomic>
 #include <chrono>
 #include <signal.h>
+#include <ctime>
 
 // NovaEngine Ultra Stream headers
 #include "ffmpeg_encoder.h"
@@ -55,15 +56,19 @@ void networkAdaptationThread() {
         double loss_ratio = 0.02;      // Simulated 2% loss
         
         // Adapt encoder to network conditions
-        adaptEncoderToNetwork(network_kbps, loss_ratio);
+        if (g_encoder) {
+            adaptEncoderToNetwork(network_kbps, loss_ratio);
+        }
         
         // Update scheduler metrics
-        vector<PathStats> path_stats;
-        path_stats.emplace_back("127.0.0.1", 5001, 25.0, 0.01);
-        path_stats.emplace_back("127.0.0.1", 5002, 30.0, 0.02);
-        path_stats.emplace_back("127.0.0.1", 5003, 35.0, 0.03);
-        
-        updateSchedulerMetrics(path_stats);
+        if (g_scheduler) {
+            vector<PathStats> path_stats;
+            path_stats.emplace_back("127.0.0.1", 5001, 25.0, 0.01);
+            path_stats.emplace_back("127.0.0.1", 5002, 30.0, 0.02);
+            path_stats.emplace_back("127.0.0.1", 5003, 35.0, 0.03);
+            
+            updateSchedulerMetrics(path_stats);
+        }
         
         // Sleep for adaptation interval
         this_thread::sleep_for(chrono::milliseconds(100));
@@ -78,28 +83,30 @@ void statisticsThread() {
     
     while (running) {
         // Get statistics from all components
-        auto encoder_stats = g_encoder->getStats();
-        auto scheduler_stats = g_scheduler->getStats();
-        auto collector_stats = g_collector->getStats();
-        auto sender_stats = g_sender_receiver->getStats();
-        
-        // Print statistics every 5 seconds
-        static int counter = 0;
-        if (++counter % 50 == 0) {  // 50 * 100ms = 5 seconds
-            cout << "\n=== NovaEngine Statistics ===" << endl;
-            cout << "Encoder: " << encoder_stats.frames_encoded << " frames, "
-                 << encoder_stats.avg_bitrate_kbps << " kbps, "
-                 << encoder_stats.current_fps << " fps" << endl;
-            cout << "Scheduler: " << scheduler_stats.total_chunks_sent << " chunks, "
-                 << scheduler_stats.avg_rtt_ms << "ms RTT, "
-                 << (scheduler_stats.avg_loss_ratio * 100) << "% loss" << endl;
-            cout << "Collector: " << collector_stats.frames_completed << "/" 
-                 << collector_stats.frames_received << " frames, "
-                 << collector_stats.avg_latency_ms << "ms latency" << endl;
-            cout << "Sender: " << sender_stats.frames_sent << " sent, "
-                 << sender_stats.frames_received << " received, "
-                 << sender_stats.throughput_mbps << " Mbps" << endl;
-            cout << "=============================" << endl;
+        if (g_encoder && g_scheduler && g_collector && g_sender_receiver) {
+            auto encoder_stats = g_encoder->getStats();
+            auto scheduler_stats = g_scheduler->getStats();
+            auto collector_stats = g_collector->getStats();
+            auto sender_stats = g_sender_receiver->getStats();
+            
+            // Print statistics every 5 seconds
+            static int counter = 0;
+            if (++counter % 50 == 0) {  // 50 * 100ms = 5 seconds
+                cout << "\n=== NovaEngine Statistics ===" << endl;
+                cout << "Encoder: " << encoder_stats.frames_encoded << " frames, "
+                     << encoder_stats.avg_bitrate_kbps << " kbps, "
+                     << encoder_stats.current_fps << " fps" << endl;
+                cout << "Scheduler: " << scheduler_stats.total_chunks_sent << " chunks, "
+                     << scheduler_stats.avg_rtt_ms << "ms RTT, "
+                     << (scheduler_stats.avg_loss_ratio * 100) << "% loss" << endl;
+                cout << "Collector: " << collector_stats.frames_completed << "/" 
+                     << collector_stats.frames_received << " frames, "
+                     << collector_stats.avg_latency_ms << "ms latency" << endl;
+                cout << "Sender: " << sender_stats.frames_sent << " sent, "
+                     << sender_stats.frames_received << " received, "
+                     << sender_stats.throughput_mbps << " Mbps" << endl;
+                cout << "=============================" << endl;
+            }
         }
         
         this_thread::sleep_for(chrono::milliseconds(100));
@@ -176,42 +183,51 @@ int main(int argc, char* argv[]) {
         if (mode == "sender" || mode == "both") {
             cout << "\n[Main] Starting sender mode..." << endl;
             
-            // Open camera
-            VideoCapture cap(0);
-            if (!cap.isOpened()) {
-                cerr << "[Main] Error: Could not open camera" << endl;
-                return 1;
-            }
-            
-            cap.set(CAP_PROP_FRAME_WIDTH, 1280);
-            cap.set(CAP_PROP_FRAME_HEIGHT, 720);
-            cap.set(CAP_PROP_FPS, 30);
+            // Force test pattern mode for now (camera access issues)
+            cout << "[Main] Using test pattern mode (camera access disabled)" << endl;
             
             Mat frame;
             uint32_t frame_id = 0;
             
-            cout << "[Main] Sender loop started. Press 'q' to quit." << endl;
+            cout << "[Main] Test pattern loop started. Press 'q' to quit." << endl;
             
             while (running && !shutdown_requested) {
-                // Capture frame
-                cap.read(frame);
-                if (frame.empty()) {
-                    cerr << "[Main] Error: Empty frame from camera" << endl;
-                    continue;
-                }
+                // Create a test pattern frame
+                frame = Mat::zeros(720, 1280, CV_8UC3);
+                
+                // Draw some test content
+                putText(frame, "NovaEngine Test Pattern", Point(50, 100), 
+                       FONT_HERSHEY_SIMPLEX, 2, Scalar(0, 255, 0), 3);
+                putText(frame, "Frame: " + to_string(frame_id), Point(50, 200), 
+                       FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 255, 255), 2);
+                putText(frame, "Time: " + to_string(time(nullptr)), Point(50, 300), 
+                       FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 255, 255), 2);
+                
+                // Draw a moving circle
+                int x = 200 + 100 * sin(frame_id * 0.1);
+                int y = 400 + 100 * cos(frame_id * 0.1);
+                circle(frame, Point(x, y), 50, Scalar(0, 0, 255), -1);
+                
+                // Draw network stats
+                putText(frame, "Network: 3000 kbps", Point(50, 500), 
+                       FONT_HERSHEY_SIMPLEX, 0.8, Scalar(255, 255, 0), 2);
+                putText(frame, "FEC: k=6, r=2", Point(50, 550), 
+                       FONT_HERSHEY_SIMPLEX, 0.8, Scalar(255, 255, 0), 2);
+                putText(frame, "Multi-tunnel: 3 UDP ports", Point(50, 600), 
+                       FONT_HERSHEY_SIMPLEX, 0.8, Scalar(255, 255, 0), 2);
                 
                 // Encode frame
                 vector<uint8_t> encoded_data;
                 if (encodeFrame(frame, encoded_data)) {
                     // Send frame
                     if (sendFrame(encoded_data, frame_id)) {
-                        cout << "[Main] Sent frame " << frame_id << " (" << encoded_data.size() << " bytes)" << endl;
+                        cout << "[Main] Sent test frame " << frame_id << " (" << encoded_data.size() << " bytes)" << endl;
                     }
                     frame_id++;
                 }
                 
                 // Display local frame
-                imshow("NovaEngine - Local Camera", frame);
+                imshow("NovaEngine - Test Pattern", frame);
                 
                 // Check for quit
                 char key = waitKey(1);
@@ -223,8 +239,6 @@ int main(int argc, char* argv[]) {
                 // Frame rate control
                 this_thread::sleep_for(chrono::milliseconds(33));  // ~30 fps
             }
-            
-            cap.release();
         }
         
         if (mode == "receiver" || mode == "both") {
@@ -263,13 +277,25 @@ int main(int argc, char* argv[]) {
     // Cleanup
     cout << "\n[Main] Shutting down NovaEngine..." << endl;
     
-    stopSenderReceiver();
-    shutdownSenderReceiver();
-    shutdownCollector();
-    shutdownScheduler();
-    shutdownErasureCoder();
-    shutdownSlicer();
-    shutdownEncoder();
+    if (g_sender_receiver) {
+        stopSenderReceiver();
+        shutdownSenderReceiver();
+    }
+    if (g_collector) {
+        shutdownCollector();
+    }
+    if (g_scheduler) {
+        shutdownScheduler();
+    }
+    if (g_erasure_coder) {
+        shutdownErasureCoder();
+    }
+    if (g_slicer) {
+        shutdownSlicer();
+    }
+    if (g_encoder) {
+        shutdownEncoder();
+    }
     
     destroyAllWindows();
     
