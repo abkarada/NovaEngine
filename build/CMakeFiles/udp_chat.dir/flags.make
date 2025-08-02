@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/raulcto/CLionProjects/Nova_Engine_V3/src
+CXX_INCLUDES = -I/home/ryuzaki/Desktop/NovaEngine/src
 
 CXX_FLAGS = -std=gnu++17
 

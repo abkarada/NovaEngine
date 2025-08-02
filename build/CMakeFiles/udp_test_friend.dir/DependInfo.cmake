@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/raulcto/CLionProjects/Nova_Engine_V3/src/core/udp_test_friend.cpp" "CMakeFiles/udp_test_friend.dir/src/core/udp_test_friend.cpp.o" "gcc" "CMakeFiles/udp_test_friend.dir/src/core/udp_test_friend.cpp.o.d"
+  "/home/ryuzaki/Desktop/NovaEngine/src/core/udp_test_friend.cpp" "CMakeFiles/udp_test_friend.dir/src/core/udp_test_friend.cpp.o" "gcc" "CMakeFiles/udp_test_friend.dir/src/core/udp_test_friend.cpp.o.d"
   )
 
 # Targets to which this target links.

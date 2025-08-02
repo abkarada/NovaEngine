@@ -54,10 +54,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/raulcto/CLionProjects/Nova_Engine_V3
+CMAKE_SOURCE_DIR = /home/ryuzaki/Desktop/NovaEngine
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/raulcto/CLionProjects/Nova_Engine_V3/build
+CMAKE_BINARY_DIR = /home/ryuzaki/Desktop/NovaEngine/build
 
 #=============================================================================
 # Directory level rules for the build root directory
@@ -91,14 +91,14 @@ clean: CMakeFiles/video_chat.dir/clean
 CMakeFiles/nova_engine.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine.dir/build.make CMakeFiles/nova_engine.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/raulcto/CLionProjects/Nova_Engine_V3/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10 "Built target nova_engine"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10 "Built target nova_engine"
 .PHONY : CMakeFiles/nova_engine.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/nova_engine.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/raulcto/CLionProjects/Nova_Engine_V3/build/CMakeFiles 10
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles 10
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/nova_engine.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/raulcto/CLionProjects/Nova_Engine_V3/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles 0
 .PHONY : CMakeFiles/nova_engine.dir/rule
 
 # Convenience name for target.
@@ -117,14 +117,14 @@ CMakeFiles/nova_engine.dir/clean:
 CMakeFiles/nova_engine_friend.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/nova_engine_friend.dir/build.make CMakeFiles/nova_engine_friend.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/raulcto/CLionProjects/Nova_Engine_V3/build/CMakeFiles --progress-num=11,12,13,14,15,16,17,18,19,20 "Built target nova_engine_friend"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles --progress-num=11,12,13,14,15,16,17,18,19,20 "Built target nova_engine_friend"
 .PHONY : CMakeFiles/nova_engine_friend.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/nova_engine_friend.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/raulcto/CLionProjects/Nova_Engine_V3/build/CMakeFiles 10
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles 10
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/nova_engine_friend.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/raulcto/CLionProjects/Nova_Engine_V3/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles 0
 .PHONY : CMakeFiles/nova_engine_friend.dir/rule
 
 # Convenience name for target.
@@ -143,14 +143,14 @@ CMakeFiles/nova_engine_friend.dir/clean:
 CMakeFiles/udp_test.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/udp_test.dir/build.make CMakeFiles/udp_test.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/udp_test.dir/build.make CMakeFiles/udp_test.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/raulcto/CLionProjects/Nova_Engine_V3/build/CMakeFiles --progress-num=23,24 "Built target udp_test"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles --progress-num=23,24 "Built target udp_test"
 .PHONY : CMakeFiles/udp_test.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/udp_test.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/raulcto/CLionProjects/Nova_Engine_V3/build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles 2
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/udp_test.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/raulcto/CLionProjects/Nova_Engine_V3/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles 0
 .PHONY : CMakeFiles/udp_test.dir/rule
 
 # Convenience name for target.
@@ -169,14 +169,14 @@ CMakeFiles/udp_test.dir/clean:
 CMakeFiles/udp_test_friend.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/udp_test_friend.dir/build.make CMakeFiles/udp_test_friend.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/udp_test_friend.dir/build.make CMakeFiles/udp_test_friend.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/raulcto/CLionProjects/Nova_Engine_V3/build/CMakeFiles --progress-num=25,26 "Built target udp_test_friend"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles --progress-num=25,26 "Built target udp_test_friend"
 .PHONY : CMakeFiles/udp_test_friend.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/udp_test_friend.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/raulcto/CLionProjects/Nova_Engine_V3/build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles 2
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/udp_test_friend.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/raulcto/CLionProjects/Nova_Engine_V3/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles 0
 .PHONY : CMakeFiles/udp_test_friend.dir/rule
 
 # Convenience name for target.
@@ -195,14 +195,14 @@ CMakeFiles/udp_test_friend.dir/clean:
 CMakeFiles/udp_chat.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/udp_chat.dir/build.make CMakeFiles/udp_chat.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/udp_chat.dir/build.make CMakeFiles/udp_chat.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/raulcto/CLionProjects/Nova_Engine_V3/build/CMakeFiles --progress-num=21,22 "Built target udp_chat"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles --progress-num=21,22 "Built target udp_chat"
 .PHONY : CMakeFiles/udp_chat.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/udp_chat.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/raulcto/CLionProjects/Nova_Engine_V3/build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles 2
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/udp_chat.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/raulcto/CLionProjects/Nova_Engine_V3/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles 0
 .PHONY : CMakeFiles/udp_chat.dir/rule
 
 # Convenience name for target.
@@ -221,14 +221,14 @@ CMakeFiles/udp_chat.dir/clean:
 CMakeFiles/video_chat.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/video_chat.dir/build.make CMakeFiles/video_chat.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/video_chat.dir/build.make CMakeFiles/video_chat.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/raulcto/CLionProjects/Nova_Engine_V3/build/CMakeFiles --progress-num=27,28 "Built target video_chat"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles --progress-num=27,28 "Built target video_chat"
 .PHONY : CMakeFiles/video_chat.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/video_chat.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/raulcto/CLionProjects/Nova_Engine_V3/build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles 2
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/video_chat.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/raulcto/CLionProjects/Nova_Engine_V3/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles 0
 .PHONY : CMakeFiles/video_chat.dir/rule
 
 # Convenience name for target.

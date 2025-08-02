@@ -2,6 +2,14 @@
 #include "ffmpeg_encoder.h"
 #include <stdexcept>
 #include <iostream>
+#include <mutex>                   // for std::mutex, std::lock_guard
+#include <vector>                  // for std::vector
+
+extern "C" {
+#include <libavcodec/avcodec.h>    // AVCodec, avcodec_alloc_context3, avcodec_open2, etc.
+#include <libavutil/opt.h>         // av_opt_set
+#include <libavutil/imgutils.h>    // av_image_get_buffer_size, etc.
+}
 
 FFmpegEncoder::FFmpegEncoder(int width, int height, int fps, int initial_bitrate_kbps)
     : frame_width_(width), frame_height_(height) {

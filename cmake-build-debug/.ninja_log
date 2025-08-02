@@ -1,0 +1,18 @@
+# ninja log v6
+2	14	1754129029201552023	CMakeFiles/nova_engine.dir/src/network/sender_receiver.cpp.o	97d68532fe6584e2
+1	14	1754129029200552020	CMakeFiles/nova_engine.dir/src/network/scheduler.cpp.o	56c788f4610bbceb
+1	15	1754129029200552020	CMakeFiles/nova_engine.dir/src/media/erasure_coder.cpp.o	e280e066ef08f175
+1	15	1754129029200552020	CMakeFiles/nova_engine.dir/src/media/slicer.cpp.o	906ec8ea5fec177c
+1	15	1754129029200552020	CMakeFiles/nova_engine.dir/src/core/engine.cpp.o	371fa60f92c84d9a
+2	15	1754129029201552023	CMakeFiles/nova_engine.dir/src/network/path_monitor.cpp.o	664fa48abd166c8d
+2	16	1754129029201552023	CMakeFiles/nova_engine.dir/src/transport/smart_collector.cpp.o	7b2b2683e848af10
+1	6306	1754129029200552020	CMakeFiles/nova_engine.dir/src/core/main.cpp.o	1a16f8e2feff39c5
+3	392	1754130689622614705	CMakeFiles/nova_engine.dir/src/media/slicer.cpp.o	906ec8ea5fec177c
+2	478	1754130689621614702	CMakeFiles/nova_engine.dir/src/media/ffmpeg_encoder.cpp.o	58a52a03f178dd19
+4	538	1754130689623614708	CMakeFiles/nova_engine.dir/src/network/path_monitor.cpp.o	664fa48abd166c8d
+3	576	1754130689622614705	CMakeFiles/nova_engine.dir/src/network/scheduler.cpp.o	56c788f4610bbceb
+3	808	1754130689622614705	CMakeFiles/nova_engine.dir/src/media/erasure_coder.cpp.o	e280e066ef08f175
+3	993	1754130689622614705	CMakeFiles/nova_engine.dir/src/network/sender_receiver.cpp.o	97d68532fe6584e2
+4	1260	1754130689623614708	CMakeFiles/nova_engine.dir/src/transport/smart_collector.cpp.o	7b2b2683e848af10
+2	1954	1754130689621614702	CMakeFiles/nova_engine.dir/src/core/engine.cpp.o	371fa60f92c84d9a
+1954	2225	1754130691573620654	nova_engine	e21eacd433afa38e

@@ -1,5 +1,5 @@
 CMakeFiles/video_chat.dir/src/core/main.cpp.o: \
- /home/raulcto/CLionProjects/Nova_Engine_V3/src/core/main.cpp \
+ /home/ryuzaki/Desktop/NovaEngine/src/core/main.cpp \
  /usr/include/stdc-predef.h /usr/include/c++/11/iostream \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/os_defines.h \

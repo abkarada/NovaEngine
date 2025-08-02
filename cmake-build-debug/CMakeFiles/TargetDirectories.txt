@@ -1,0 +1,8 @@
+/home/ryuzaki/Desktop/NovaEngine/cmake-build-debug/CMakeFiles/nova_engine.dir
+/home/ryuzaki/Desktop/NovaEngine/cmake-build-debug/CMakeFiles/nova_engine_friend.dir
+/home/ryuzaki/Desktop/NovaEngine/cmake-build-debug/CMakeFiles/udp_test.dir
+/home/ryuzaki/Desktop/NovaEngine/cmake-build-debug/CMakeFiles/udp_test_friend.dir
+/home/ryuzaki/Desktop/NovaEngine/cmake-build-debug/CMakeFiles/udp_chat.dir
+/home/ryuzaki/Desktop/NovaEngine/cmake-build-debug/CMakeFiles/video_chat.dir
+/home/ryuzaki/Desktop/NovaEngine/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/ryuzaki/Desktop/NovaEngine/cmake-build-debug/CMakeFiles/rebuild_cache.dir
