@@ -14,7 +14,6 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/ryuzaki/Desktop/NovaEngine/src/ffmpeg_encoder.cpp" "CMakeFiles/novaengine.dir/src/ffmpeg_encoder.cpp.o" "gcc" "CMakeFiles/novaengine.dir/src/ffmpeg_encoder.cpp.o.d"
   "/home/ryuzaki/Desktop/NovaEngine/src/loss_tracker.cpp" "CMakeFiles/novaengine.dir/src/loss_tracker.cpp.o" "gcc" "CMakeFiles/novaengine.dir/src/loss_tracker.cpp.o.d"
   "/home/ryuzaki/Desktop/NovaEngine/src/main.cpp" "CMakeFiles/novaengine.dir/src/main.cpp.o" "gcc" "CMakeFiles/novaengine.dir/src/main.cpp.o.d"
-  "/home/ryuzaki/Desktop/NovaEngine/src/packet_parser.cpp" "CMakeFiles/novaengine.dir/src/packet_parser.cpp.o" "gcc" "CMakeFiles/novaengine.dir/src/packet_parser.cpp.o.d"
   "/home/ryuzaki/Desktop/NovaEngine/src/ping_handler.cpp" "CMakeFiles/novaengine.dir/src/ping_handler.cpp.o" "gcc" "CMakeFiles/novaengine.dir/src/ping_handler.cpp.o.d"
   "/home/ryuzaki/Desktop/NovaEngine/src/ping_sender.cpp" "CMakeFiles/novaengine.dir/src/ping_sender.cpp.o" "gcc" "CMakeFiles/novaengine.dir/src/ping_sender.cpp.o.d"
   "/home/ryuzaki/Desktop/NovaEngine/src/rtt_monitor.cpp" "CMakeFiles/novaengine.dir/src/rtt_monitor.cpp.o" "gcc" "CMakeFiles/novaengine.dir/src/rtt_monitor.cpp.o.d"

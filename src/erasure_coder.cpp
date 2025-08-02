@@ -1,164 +1,303 @@
 #include "erasure_coder.hpp"
-#include <stdexcept>
 #include <jerasure.h>
 #include <reed_sol.h>
-#include <cstring>
-#include <vector>
 #include <iostream>
+#include <chrono>
+#include <cstring>
+#include <algorithm>
 
-ErasureCoder::ErasureCoder(int k, int r, int w)
-    : k_(k), r_(r), w_(w) {
-    matrix_ = reed_sol_vandermonde_coding_matrix(k_, r_, w_);
-    if (!matrix_) throw std::runtime_error("Failed to create coding matrix");
+// NovaEngine Ultra Stream - True Reed-Solomon FEC
+// High-performance erasure coding with libjerasure
+
+// Global erasure coder instance
+ErasureCoder* g_erasure_coder = nullptr;
+
+ErasureCoder::ErasureCoder(int k_chunks, int r_chunks, int chunk_size)
+    : k_(k_chunks), r_(r_chunks), chunk_size_(chunk_size), 
+      rs_matrix_(nullptr), rs_bitmatrix_(nullptr) {
+    
+    if (!initMatrices()) {
+        throw std::runtime_error("Failed to initialize Reed-Solomon matrices");
+    }
+    
+    std::cout << "[ErasureCoder] Initialized with k=" << k_ << ", r=" << r_ 
+              << ", chunk_size=" << chunk_size_ << std::endl;
 }
 
 ErasureCoder::~ErasureCoder() {
-    if (matrix_) free(matrix_);
+    cleanupMatrices();
 }
 
-void ErasureCoder::encode(const std::vector<std::vector<uint8_t>>& k_chunks,
-                          std::vector<std::vector<uint8_t>>& out_blocks) {
-    if (k_chunks.size() != static_cast<size_t>(k_))
-        throw std::runtime_error("Invalid number of data chunks");
-
-    size_t block_size = k_chunks[0].size();
+std::vector<std::vector<uint8_t>> ErasureCoder::encode(const std::vector<uint8_t>& data) {
+    auto start_time = std::chrono::high_resolution_clock::now();
     
-    // Initialize output blocks with data chunks
-    out_blocks.clear();
-    out_blocks.reserve(k_ + r_);
+    // Pad data to fit exactly k chunks
+    std::vector<uint8_t> padded_data = padData(data);
     
-    // Copy data chunks
-    for (const auto& chunk : k_chunks) {
-        out_blocks.push_back(chunk);
-    }
-    
-    // Add parity chunks (initialized to zero)
-    for (int i = 0; i < r_; ++i) {
-        out_blocks.push_back(std::vector<uint8_t>(block_size, 0));
-    }
-
-    std::vector<uint8_t*> data_ptrs(k_);
-    std::vector<uint8_t*> code_ptrs(r_);
-    for (int i = 0; i < k_; ++i) data_ptrs[i] = const_cast<uint8_t*>(k_chunks[i].data());
-    for (int i = 0; i < r_; ++i) code_ptrs[i] = out_blocks[k_ + i].data();
-
-    std::cout << "[FEC] Encoding " << k_ << " data chunks + " << r_ << " parity chunks, block_size=" << block_size << std::endl;
-
-    jerasure_matrix_encode(k_, r_, w_, matrix_,
-                           reinterpret_cast<char**>(data_ptrs.data()),
-                           reinterpret_cast<char**>(code_ptrs.data()),
-                           block_size);
-                           
-    std::cout << "[FEC] Encoded " << out_blocks.size() << " total chunks" << std::endl;
-}
-
-bool ErasureCoder::decode(const std::vector<std::vector<uint8_t>>& blocks,
-                          const std::vector<bool>& received,
-                          std::vector<uint8_t>& recovered_data) {
-    if (blocks.size() != static_cast<size_t>(k_ + r_)) {
-        std::cerr << "[FEC] Invalid blocks size: " << blocks.size() << " != " << (k_ + r_) << std::endl;
-        return false;
-    }
-    if (received.size() != blocks.size()) {
-        std::cerr << "[FEC] Invalid received flags size: " << received.size() << " != " << blocks.size() << std::endl;
-        return false;
-    }
-
-    size_t block_size = blocks[0].size();
-    
-    // Count received blocks
-    int received_count = 0;
-    for (bool r : received) if (r) received_count++;
-    
-    if (received_count < k_) {
-        std::cerr << "[FEC] Not enough blocks received: " << received_count << " < " << k_ << std::endl;
-        return false;
-    }
-
-    // Create working copies of the blocks
-    std::vector<std::vector<uint8_t>> working_blocks = blocks;
-    
-    // Prepare data and parity pointers
-    std::vector<uint8_t*> data_ptrs(k_);
-    std::vector<uint8_t*> code_ptrs(r_);
+    // Prepare data pointers for jerasure
+    char** data_ptrs = new char*[k_];
+    char** coding_ptrs = new char*[r_];
     
     for (int i = 0; i < k_; ++i) {
-        data_ptrs[i] = working_blocks[i].data();
+        data_ptrs[i] = new char[chunk_size_];
+        memcpy(data_ptrs[i], padded_data.data() + i * chunk_size_, chunk_size_);
+    }
+    
+    for (int i = 0; i < r_; ++i) {
+        coding_ptrs[i] = new char[chunk_size_];
+        memset(coding_ptrs[i], 0, chunk_size_);
+    }
+    
+    // Perform Reed-Solomon encoding
+    jerasure_matrix_encode(k_, r_, 8, rs_matrix_, data_ptrs, coding_ptrs, chunk_size_);
+    
+    // Collect all chunks (data + parity)
+    std::vector<std::vector<uint8_t>> chunks;
+    
+    // Add data chunks
+    for (int i = 0; i < k_; ++i) {
+        std::vector<uint8_t> chunk(data_ptrs[i], data_ptrs[i] + chunk_size_);
+        chunks.push_back(chunk);
+    }
+    
+    // Add parity chunks
+    for (int i = 0; i < r_; ++i) {
+        std::vector<uint8_t> chunk(coding_ptrs[i], coding_ptrs[i] + chunk_size_);
+        chunks.push_back(chunk);
+    }
+    
+    // Cleanup
+    for (int i = 0; i < k_; ++i) {
+        delete[] data_ptrs[i];
     }
     for (int i = 0; i < r_; ++i) {
-        code_ptrs[i] = working_blocks[k_ + i].data();
+        delete[] coding_ptrs[i];
     }
+    delete[] data_ptrs;
+    delete[] coding_ptrs;
+    
+    // Update statistics
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+    
+    stats_.frames_encoded++;
+    stats_.total_encode_time_us += duration.count();
+    
+    std::cout << "[ErasureCoder] Encoded " << data.size() << " bytes into " 
+              << chunks.size() << " chunks in " << duration.count() << "μs" << std::endl;
+    
+    return chunks;
+}
 
-    // Build erasure list
-    std::vector<int> erasures;
+std::vector<uint8_t> ErasureCoder::decode(const std::vector<std::vector<uint8_t>>& chunks,
+                                         const std::vector<bool>& chunk_available) {
+    auto start_time = std::chrono::high_resolution_clock::now();
+    
+    if (!canDecode(chunk_available)) {
+        stats_.frames_lost++;
+        return {};
+    }
+    
+    // Prepare data pointers for jerasure
+    char** data_ptrs = new char*[k_ + r_];
+    char** coding_ptrs = new char*[r_];
+    
     for (int i = 0; i < k_ + r_; ++i) {
-        if (!received[i]) {
-            erasures.push_back(i);
+        data_ptrs[i] = new char[chunk_size_];
+        if (chunk_available[i]) {
+            memcpy(data_ptrs[i], chunks[i].data(), chunk_size_);
+        } else {
+            memset(data_ptrs[i], 0, chunk_size_);
         }
     }
-    erasures.push_back(-1); // terminator
-
-    // If no erasures, just return the data blocks
-    if (erasures.size() == 1) {
-        recovered_data.clear();
-        for (int i = 0; i < k_; ++i) {
-            recovered_data.insert(recovered_data.end(), 
-                                working_blocks[i].begin(), 
-                                working_blocks[i].end());
-        }
-        return true;
+    
+    for (int i = 0; i < r_; ++i) {
+        coding_ptrs[i] = data_ptrs[k_ + i];
     }
-
+    
+    // Create erasures list
+    std::vector<int> erasures = createErasuresList(chunk_available);
+    
     // Perform Reed-Solomon decoding
-    std::cout << "[FEC] Attempting jerasure_matrix_decode with " << erasures.size()-1 << " erasures" << std::endl;
-    std::cout << "[FEC] Erasures: ";
-    for (int i = 0; i < erasures.size()-1; ++i) {
-        std::cout << erasures[i] << " ";
-    }
-    std::cout << std::endl;
+    int decode_result = jerasure_matrix_decode(k_, r_, 8, rs_matrix_, 1, 
+                                             erasures.data(), data_ptrs, coding_ptrs, chunk_size_);
     
-    std::cout << "[FEC] Block sizes: ";
+    std::vector<uint8_t> decoded_data;
+    
+    if (decode_result == 0) {
+        // Successfully decoded
+        for (int i = 0; i < k_; ++i) {
+            decoded_data.insert(decoded_data.end(), 
+                              reinterpret_cast<uint8_t*>(data_ptrs[i]),
+                              reinterpret_cast<uint8_t*>(data_ptrs[i]) + chunk_size_);
+        }
+        
+        stats_.frames_decoded++;
+        if (erasures.size() > 0) {
+            stats_.frames_recovered++;
+        }
+        
+        std::cout << "[ErasureCoder] Successfully decoded frame with " 
+                  << erasures.size() << " erasures" << std::endl;
+    } else {
+        stats_.frames_lost++;
+        std::cout << "[ErasureCoder] Failed to decode frame (result: " << decode_result << ")" << std::endl;
+    }
+    
+    // Cleanup
     for (int i = 0; i < k_ + r_; ++i) {
-        std::cout << working_blocks[i].size() << " ";
+        delete[] data_ptrs[i];
     }
-    std::cout << std::endl;
+    delete[] data_ptrs;
     
-    // Validate pointers before calling jerasure
-    for (int i = 0; i < k_; ++i) {
-        if (!data_ptrs[i]) {
-            std::cerr << "[FEC] ERROR: data_ptrs[" << i << "] is null!" << std::endl;
-            return false;
-        }
-    }
-    for (int i = 0; i < r_; ++i) {
-        if (!code_ptrs[i]) {
-            std::cerr << "[FEC] ERROR: code_ptrs[" << i << "] is null!" << std::endl;
-            return false;
-        }
-    }
+    // Update statistics
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+    stats_.total_decode_time_us += duration.count();
     
-    std::cout << "[FEC] All pointers validated, calling jerasure_matrix_decode..." << std::endl;
-    
-    int ret = jerasure_matrix_decode(k_, r_, w_, matrix_, 0, erasures.data(),
-                                     reinterpret_cast<char**>(data_ptrs.data()),
-                                     reinterpret_cast<char**>(code_ptrs.data()),
-                                     block_size);
-                                     
-    std::cout << "[FEC] jerasure_matrix_decode returned: " << ret << std::endl;
-    
-    if (ret < 0) {
-        std::cerr << "[FEC] Decode failed with error: " << ret << std::endl;
+    return decoded_data;
+}
+
+bool ErasureCoder::canDecode(const std::vector<bool>& chunk_available) const {
+    if (chunk_available.size() != k_ + r_) {
         return false;
     }
+    
+    int available_count = 0;
+    for (bool available : chunk_available) {
+        if (available) available_count++;
+    }
+    
+    return available_count >= k_;
+}
 
-    // Extract recovered data
-    recovered_data.clear();
-    for (int i = 0; i < k_; ++i) {
-        recovered_data.insert(recovered_data.end(), 
-                            working_blocks[i].begin(), 
-                            working_blocks[i].end());
+ErasureCoder::CodingStats ErasureCoder::getStats() const {
+    CodingStats stats = stats_;
+    
+    // Calculate recovery rate
+    if (stats.frames_decoded > 0) {
+        stats.recovery_rate = static_cast<double>(stats.frames_recovered) / stats.frames_decoded;
+    }
+    
+    return stats;
+}
+
+void ErasureCoder::setParams(int k, int r, int chunk_size) {
+    cleanupMatrices();
+    
+    k_ = k;
+    r_ = r;
+    chunk_size_ = chunk_size;
+    
+    if (!initMatrices()) {
+        throw std::runtime_error("Failed to reinitialize Reed-Solomon matrices");
+    }
+    
+    std::cout << "[ErasureCoder] Parameters updated: k=" << k_ << ", r=" << r_ 
+              << ", chunk_size=" << chunk_size_ << std::endl;
+}
+
+bool ErasureCoder::initMatrices() {
+    // Initialize Reed-Solomon encoding matrix
+    rs_matrix_ = reed_sol_vandermonde_coding_matrix(k_, r_, 8);
+    if (!rs_matrix_) {
+        std::cerr << "[ErasureCoder] Failed to create Reed-Solomon matrix" << std::endl;
+        return false;
+    }
+    
+    // Create bit matrix for faster operations
+    rs_bitmatrix_ = jerasure_matrix_to_bitmatrix(k_, r_, 8, rs_matrix_);
+    if (!rs_bitmatrix_) {
+        std::cerr << "[ErasureCoder] Failed to create bit matrix" << std::endl;
+        return false;
     }
     
     return true;
+}
+
+void ErasureCoder::cleanupMatrices() {
+    if (rs_matrix_) {
+        free(rs_matrix_);
+        rs_matrix_ = nullptr;
+    }
+    
+    if (rs_bitmatrix_) {
+        free(rs_bitmatrix_);
+        rs_bitmatrix_ = nullptr;
+    }
+}
+
+std::vector<uint8_t> ErasureCoder::padData(const std::vector<uint8_t>& data) {
+    int target_size = k_ * chunk_size_;
+    std::vector<uint8_t> padded = data;
+    
+    if (padded.size() < static_cast<size_t>(target_size)) {
+        // Pad with zeros
+        padded.resize(target_size, 0);
+    } else if (padded.size() > static_cast<size_t>(target_size)) {
+        // Truncate
+        padded.resize(target_size);
+    }
+    
+    return padded;
+}
+
+std::vector<uint8_t> ErasureCoder::unpadData(const std::vector<uint8_t>& data, size_t original_size) {
+    if (data.size() <= original_size) {
+        return data;
+    }
+    
+    return std::vector<uint8_t>(data.begin(), data.begin() + original_size);
+}
+
+std::vector<int> ErasureCoder::createErasuresList(const std::vector<bool>& chunk_available) {
+    std::vector<int> erasures;
+    
+    for (size_t i = 0; i < chunk_available.size(); ++i) {
+        if (!chunk_available[i]) {
+            erasures.push_back(static_cast<int>(i));
+        }
+    }
+    
+    // Add -1 terminator
+    erasures.push_back(-1);
+    
+    return erasures;
+}
+
+// Global interface functions
+void initErasureCoder(int k, int r, int chunk_size) {
+    if (g_erasure_coder) {
+        delete g_erasure_coder;
+    }
+    
+    g_erasure_coder = new ErasureCoder(k, r, chunk_size);
+    std::cout << "[ErasureCoder] ✅ Global erasure coder initialized" << std::endl;
+}
+
+std::vector<std::vector<uint8_t>> encodeFrame(const std::vector<uint8_t>& data) {
+    if (!g_erasure_coder) {
+        throw std::runtime_error("Erasure coder not initialized");
+    }
+    
+    return g_erasure_coder->encode(data);
+}
+
+std::vector<uint8_t> decodeFrame(const std::vector<std::vector<uint8_t>>& chunks,
+                                const std::vector<bool>& chunk_available) {
+    if (!g_erasure_coder) {
+        throw std::runtime_error("Erasure coder not initialized");
+    }
+    
+    return g_erasure_coder->decode(chunks, chunk_available);
+}
+
+void shutdownErasureCoder() {
+    if (g_erasure_coder) {
+        delete g_erasure_coder;
+        g_erasure_coder = nullptr;
+    }
+    
+    std::cout << "[ErasureCoder] Erasure coder shutdown complete" << std::endl;
 }
 

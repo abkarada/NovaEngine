@@ -14,15 +14,6 @@
 # EXTERNAL cache entries
 ########################
 
-//Path to a library.
-AVCODEC_LIB:FILEPATH=/usr/lib/x86_64-linux-gnu/libavcodec.so
-
-//Path to a library.
-AVFORMAT_LIB:FILEPATH=/usr/lib/x86_64-linux-gnu/libavformat.so
-
-//Path to a library.
-AVUTIL_LIB:FILEPATH=/usr/lib/x86_64-linux-gnu/libavutil.so
-
 //Path to a program.
 CMAKE_ADDR2LINE:FILEPATH=/usr/bin/addr2line
 
@@ -236,8 +227,29 @@ NovaEngine_SOURCE_DIR:STATIC=/home/ryuzaki/Desktop/NovaEngine
 //The directory containing a CMake configuration file for OpenCV.
 OpenCV_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/opencv4
 
+//Arguments to supply to pkg-config
+PKG_CONFIG_ARGN:STRING=
+
+//pkg-config executable
+PKG_CONFIG_EXECUTABLE:FILEPATH=/usr/bin/pkg-config
+
 //Path to a library.
-SWSCALE_LIB:FILEPATH=/usr/lib/x86_64-linux-gnu/libswscale.so
+REED_SOL_LIB:FILEPATH=REED_SOL_LIB-NOTFOUND
+
+//Path to a library.
+pkgcfg_lib_FFMPEG_avcodec:FILEPATH=/usr/lib/x86_64-linux-gnu/libavcodec.so
+
+//Path to a library.
+pkgcfg_lib_FFMPEG_avformat:FILEPATH=/usr/lib/x86_64-linux-gnu/libavformat.so
+
+//Path to a library.
+pkgcfg_lib_FFMPEG_avutil:FILEPATH=/usr/lib/x86_64-linux-gnu/libavutil.so
+
+//Path to a library.
+pkgcfg_lib_FFMPEG_swresample:FILEPATH=/usr/lib/x86_64-linux-gnu/libswresample.so
+
+//Path to a library.
+pkgcfg_lib_FFMPEG_swscale:FILEPATH=/usr/lib/x86_64-linux-gnu/libswscale.so
 
 
 ########################
@@ -387,6 +399,81 @@ CMAKE_STRIP-ADVANCED:INTERNAL=1
 CMAKE_UNAME:INTERNAL=/usr/bin/uname
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
+FFMPEG_CFLAGS:INTERNAL=-I/usr/include/x86_64-linux-gnu
+FFMPEG_CFLAGS_I:INTERNAL=
+FFMPEG_CFLAGS_OTHER:INTERNAL=
+FFMPEG_FOUND:INTERNAL=1
+FFMPEG_INCLUDEDIR:INTERNAL=
+FFMPEG_INCLUDE_DIRS:INTERNAL=/usr/include/x86_64-linux-gnu
+FFMPEG_LDFLAGS:INTERNAL=-L/usr/lib/x86_64-linux-gnu;-lavcodec;-lavutil;-lswscale;-lavformat;-lswresample
+FFMPEG_LDFLAGS_OTHER:INTERNAL=
+FFMPEG_LIBDIR:INTERNAL=
+FFMPEG_LIBRARIES:INTERNAL=avcodec;avutil;swscale;avformat;swresample
+FFMPEG_LIBRARY_DIRS:INTERNAL=/usr/lib/x86_64-linux-gnu
+FFMPEG_LIBS:INTERNAL=
+FFMPEG_LIBS_L:INTERNAL=
+FFMPEG_LIBS_OTHER:INTERNAL=
+FFMPEG_LIBS_PATHS:INTERNAL=
+FFMPEG_MODULE_NAME:INTERNAL=
+FFMPEG_PREFIX:INTERNAL=
+FFMPEG_STATIC_CFLAGS:INTERNAL=-I/usr/include/x86_64-linux-gnu
+FFMPEG_STATIC_CFLAGS_I:INTERNAL=
+FFMPEG_STATIC_CFLAGS_OTHER:INTERNAL=
+FFMPEG_STATIC_INCLUDE_DIRS:INTERNAL=/usr/include/x86_64-linux-gnu
+FFMPEG_STATIC_LDFLAGS:INTERNAL=-L/usr/lib/x86_64-linux-gnu;-lswscale;-lm;-lavformat;-lm;-lxml2;-lbz2;-lgme;-lopenmpt;-lstdc++;-lchromaprint;-lbluray;-lz;-lgnutls;-lrabbitmq;-lsrt-gnutls;-lssh;-lzmq;-lavcodec;-lvpx;-lm;-lvpx;-lm;-lvpx;-lm;-lvpx;-lm;-lwebpmux;-lwebp;-lm;-llzma;-ldav1d;-lrsvg-2;-lm;-lgio-2.0;-lgdk_pixbuf-2.0;-lgobject-2.0;-lglib-2.0;-lcairo;-lzvbi;-lm;-lpthread;-lm;-lpng;-lz;-lsnappy;-lstdc++;-lz;-laom;-lcodec2;-lgsm;-lmp3lame;-lm;-lopenjp2;-lopus;-lm;-lshine;-lspeex;-ltheoraenc;-ltheoradec;-logg;-ltwolame;-lvorbis;-lvorbisenc;-lwebp;-lx264;-lx265;-lxvidcore;-pthread;-lva;-lmfx;-lstdc++;-ldl;-lswresample;-lm;-lsoxr;-lavutil;-pthread;-lva-drm;-lva;-lva-x11;-lva;-lvdpau;-lX11;-lm;-ldrm;-lmfx;-lstdc++;-ldl;-lOpenCL;-lva;-lXv;-lX11;-lXext
+FFMPEG_STATIC_LDFLAGS_OTHER:INTERNAL=-pthread
+FFMPEG_STATIC_LIBDIR:INTERNAL=
+FFMPEG_STATIC_LIBRARIES:INTERNAL=swscale;m;avformat;m;xml2;bz2;gme;openmpt;stdc++;chromaprint;bluray;z;gnutls;rabbitmq;srt-gnutls;ssh;zmq;avcodec;vpx;m;vpx;m;vpx;m;vpx;m;webpmux;webp;m;lzma;dav1d;rsvg-2;m;gio-2.0;gdk_pixbuf-2.0;gobject-2.0;glib-2.0;cairo;zvbi;m;pthread;m;png;z;snappy;stdc++;z;aom;codec2;gsm;mp3lame;m;openjp2;opus;m;shine;speex;theoraenc;theoradec;ogg;twolame;vorbis;vorbisenc;webp;x264;x265;xvidcore;va;mfx;stdc++;dl;swresample;m;soxr;avutil;va-drm;va;va-x11;va;vdpau;X11;m;drm;mfx;stdc++;dl;OpenCL;va;Xv;X11;Xext
+FFMPEG_STATIC_LIBRARY_DIRS:INTERNAL=/usr/lib/x86_64-linux-gnu
+FFMPEG_STATIC_LIBS:INTERNAL=
+FFMPEG_STATIC_LIBS_L:INTERNAL=
+FFMPEG_STATIC_LIBS_OTHER:INTERNAL=
+FFMPEG_STATIC_LIBS_PATHS:INTERNAL=
+FFMPEG_VERSION:INTERNAL=
+FFMPEG_libavcodec_INCLUDEDIR:INTERNAL=/usr/include/x86_64-linux-gnu
+FFMPEG_libavcodec_LIBDIR:INTERNAL=/usr/lib/x86_64-linux-gnu
+FFMPEG_libavcodec_MODULE_NAME:INTERNAL=libavcodec
+FFMPEG_libavcodec_PREFIX:INTERNAL=/usr
+FFMPEG_libavcodec_VERSION:INTERNAL=58.134.100
+FFMPEG_libavformat_INCLUDEDIR:INTERNAL=/usr/include/x86_64-linux-gnu
+FFMPEG_libavformat_LIBDIR:INTERNAL=/usr/lib/x86_64-linux-gnu
+FFMPEG_libavformat_MODULE_NAME:INTERNAL=libavformat
+FFMPEG_libavformat_PREFIX:INTERNAL=/usr
+FFMPEG_libavformat_VERSION:INTERNAL=58.76.100
+FFMPEG_libavutil_INCLUDEDIR:INTERNAL=/usr/include/x86_64-linux-gnu
+FFMPEG_libavutil_LIBDIR:INTERNAL=/usr/lib/x86_64-linux-gnu
+FFMPEG_libavutil_MODULE_NAME:INTERNAL=libavutil
+FFMPEG_libavutil_PREFIX:INTERNAL=/usr
+FFMPEG_libavutil_VERSION:INTERNAL=56.70.100
+FFMPEG_libswresample_INCLUDEDIR:INTERNAL=/usr/include/x86_64-linux-gnu
+FFMPEG_libswresample_LIBDIR:INTERNAL=/usr/lib/x86_64-linux-gnu
+FFMPEG_libswresample_MODULE_NAME:INTERNAL=libswresample
+FFMPEG_libswresample_PREFIX:INTERNAL=/usr
+FFMPEG_libswresample_VERSION:INTERNAL=3.9.100
+FFMPEG_libswscale_INCLUDEDIR:INTERNAL=/usr/include/x86_64-linux-gnu
+FFMPEG_libswscale_LIBDIR:INTERNAL=/usr/lib/x86_64-linux-gnu
+FFMPEG_libswscale_MODULE_NAME:INTERNAL=libswscale
+FFMPEG_libswscale_PREFIX:INTERNAL=/usr
+FFMPEG_libswscale_VERSION:INTERNAL=5.9.100
 //Details about finding OpenCV
 FIND_PACKAGE_MESSAGE_DETAILS_OpenCV:INTERNAL=[/usr][v4.5.4()]
+//Details about finding PkgConfig
+FIND_PACKAGE_MESSAGE_DETAILS_PkgConfig:INTERNAL=[/usr/bin/pkg-config][v0.29.2()]
+//ADVANCED property for variable: PKG_CONFIG_ARGN
+PKG_CONFIG_ARGN-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: PKG_CONFIG_EXECUTABLE
+PKG_CONFIG_EXECUTABLE-ADVANCED:INTERNAL=1
+__pkg_config_arguments_FFMPEG:INTERNAL=REQUIRED;libavcodec;libavutil;libswscale;libavformat;libswresample
+__pkg_config_checked_FFMPEG:INTERNAL=1
+//ADVANCED property for variable: pkgcfg_lib_FFMPEG_avcodec
+pkgcfg_lib_FFMPEG_avcodec-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: pkgcfg_lib_FFMPEG_avformat
+pkgcfg_lib_FFMPEG_avformat-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: pkgcfg_lib_FFMPEG_avutil
+pkgcfg_lib_FFMPEG_avutil-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: pkgcfg_lib_FFMPEG_swresample
+pkgcfg_lib_FFMPEG_swresample-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: pkgcfg_lib_FFMPEG_swscale
+pkgcfg_lib_FFMPEG_swscale-ADVANCED:INTERNAL=1
+prefix_result:INTERNAL=/usr/lib/x86_64-linux-gnu
 

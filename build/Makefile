@@ -273,30 +273,6 @@ src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
-src/packet_parser.o: src/packet_parser.cpp.o
-.PHONY : src/packet_parser.o
-
-# target to build an object file
-src/packet_parser.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/packet_parser.cpp.o
-.PHONY : src/packet_parser.cpp.o
-
-src/packet_parser.i: src/packet_parser.cpp.i
-.PHONY : src/packet_parser.i
-
-# target to preprocess a source file
-src/packet_parser.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/packet_parser.cpp.i
-.PHONY : src/packet_parser.cpp.i
-
-src/packet_parser.s: src/packet_parser.cpp.s
-.PHONY : src/packet_parser.s
-
-# target to generate assembly for a file
-src/packet_parser.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/packet_parser.cpp.s
-.PHONY : src/packet_parser.cpp.s
-
 src/ping_handler.o: src/ping_handler.cpp.o
 .PHONY : src/ping_handler.o
 
@@ -516,9 +492,6 @@ help:
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
-	@echo "... src/packet_parser.o"
-	@echo "... src/packet_parser.i"
-	@echo "... src/packet_parser.s"
 	@echo "... src/ping_handler.o"
 	@echo "... src/ping_handler.i"
 	@echo "... src/ping_handler.s"

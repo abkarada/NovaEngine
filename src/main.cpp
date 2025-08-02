@@ -1,449 +1,279 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/videoio.hpp>
-#include "ffmpeg_encoder.h"
-#include "decode_and_display.hpp"
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <fcntl.h>
-#include <unistd.h>
+#include <iostream>
 #include <thread>
 #include <atomic>
-#include <map>
-#include <vector>
 #include <chrono>
-#include <iostream>
-#include <cstring>
-#include <mutex>
-#include <jerasure.h>
-#include <reed_sol.h>
+#include <signal.h>
+
+// NovaEngine Ultra Stream headers
+#include "ffmpeg_encoder.h"
+#include "slicer.hpp"
+#include "erasure_coder.hpp"
+#include "udp_sender.hpp"
+#include "scheduler.hpp"
+#include "smart_collector.hpp"
+#include "sender_receiver.hpp"
+#include "decode_and_display.hpp"
 
 using namespace cv;
 using namespace std;
 
 // Global state
 static atomic<bool> running{true};
-static int udp_socket = -1;
-static constexpr int CHUNK_SIZE = 1000;
-static constexpr int FRAME_TIMEOUT_MS = 50;
-static constexpr int K_CHUNKS = 6;  // Data chunks
-static constexpr int R_CHUNKS = 2;  // Parity chunks
-static constexpr int TOTAL_CHUNKS = K_CHUNKS + R_CHUNKS;
+static atomic<bool> shutdown_requested{false};
 
-// Reed-Solomon FEC setup
-static int* rs_matrix = nullptr;
-static int* rs_bitmatrix = nullptr;
-
-// Thread-safe frame buffer with FEC support
-struct FrameBuffer {
-    map<uint16_t, vector<vector<uint8_t>>> chunks;
-    map<uint16_t, vector<bool>> chunk_received;
-    map<uint16_t, chrono::steady_clock::time_point> timestamps;
-    mutex mtx;
-    
-    void add_chunk(uint16_t frame_id, uint8_t chunk_id, vector<uint8_t>&& payload) {
-        lock_guard<mutex> lock(mtx);
-        
-        if (chunks[frame_id].empty()) {
-            chunks[frame_id].resize(TOTAL_CHUNKS);
-            chunk_received[frame_id].resize(TOTAL_CHUNKS, false);
-            timestamps[frame_id] = chrono::steady_clock::now();
-        }
-        
-        if (chunk_id < TOTAL_CHUNKS) {
-            chunks[frame_id][chunk_id] = move(payload);
-            chunk_received[frame_id][chunk_id] = true;
-        }
-    }
-    
-    bool can_decode_frame(uint16_t frame_id) {
-        lock_guard<mutex> lock(mtx);
-        auto it = chunk_received.find(frame_id);
-        if (it == chunk_received.end()) return false;
-        
-        int received_count = 0;
-        for (bool received : it->second) {
-            if (received) received_count++;
-        }
-        
-        return received_count >= K_CHUNKS;  // Need at least k chunks to decode
-    }
-    
-    vector<uint8_t> decode_frame(uint16_t frame_id) {
-        lock_guard<mutex> lock(mtx);
-        auto it = chunks.find(frame_id);
-        auto received_it = chunk_received.find(frame_id);
-        
-        if (it == chunks.end() || received_it == chunk_received.end()) {
-            return {};
-        }
-        
-        // Count received chunks and create erasures list
-        int received_count = 0;
-        vector<int> received_chunks;
-        vector<int> erasures;
-        
-        for (int i = 0; i < TOTAL_CHUNKS; ++i) {
-            if (received_it->second[i]) {
-                received_count++;
-                received_chunks.push_back(i);
-            } else {
-                erasures.push_back(i);
-            }
-        }
-        
-        if (received_count < K_CHUNKS) {
-            return {};  // Not enough chunks
-        }
-        
-        // Prepare data for FEC decode
-        char** data_ptrs = new char*[TOTAL_CHUNKS];
-        char** coding_ptrs = new char*[R_CHUNKS];
-        
-        for (int i = 0; i < TOTAL_CHUNKS; ++i) {
-            data_ptrs[i] = new char[CHUNK_SIZE];
-            if (received_it->second[i]) {
-                memcpy(data_ptrs[i], it->second[i].data(), CHUNK_SIZE);
-            } else {
-                memset(data_ptrs[i], 0, CHUNK_SIZE);
-            }
-        }
-        
-        for (int i = 0; i < R_CHUNKS; ++i) {
-            coding_ptrs[i] = data_ptrs[K_CHUNKS + i];
-        }
-        
-        // Perform FEC decode
-        int decode_result = jerasure_matrix_decode(K_CHUNKS, R_CHUNKS, 8, 
-                                                 rs_matrix, 1, erasures.data(), 
-                                                 data_ptrs, coding_ptrs, CHUNK_SIZE);
-        
-        vector<uint8_t> frame_data;
-        if (decode_result == 0) {
-            // Successfully decoded, reconstruct frame
-            cout << "[FEC] Successfully decoded frame " << frame_id << endl;
-            for (int i = 0; i < K_CHUNKS; ++i) {
-                frame_data.insert(frame_data.end(), 
-                                reinterpret_cast<uint8_t*>(data_ptrs[i]),
-                                reinterpret_cast<uint8_t*>(data_ptrs[i]) + CHUNK_SIZE);
-            }
-            cout << "[FEC] Reconstructed frame size: " << frame_data.size() << " bytes" << endl;
-        } else {
-            cout << "[FEC] Failed to decode frame " << frame_id << " (result: " << decode_result << ")" << endl;
-        }
-        
-        // Cleanup
-        for (int i = 0; i < TOTAL_CHUNKS; ++i) {
-            delete[] data_ptrs[i];
-        }
-        delete[] data_ptrs;
-        delete[] coding_ptrs;
-        
-        // Remove frame from buffer
-        chunks.erase(frame_id);
-        chunk_received.erase(frame_id);
-        timestamps.erase(frame_id);
-        
-        return frame_data;
-    }
-    
-    void cleanup_expired() {
-        lock_guard<mutex> lock(mtx);
-        auto now = chrono::steady_clock::now();
-        
-        for (auto it = timestamps.begin(); it != timestamps.end();) {
-            auto elapsed = chrono::duration_cast<chrono::milliseconds>(now - it->second).count();
-            if (elapsed > FRAME_TIMEOUT_MS) {
-                chunks.erase(it->first);
-                chunk_received.erase(it->first);
-                it = timestamps.erase(it);
-            } else {
-                ++it;
-            }
-        }
-    }
-};
-
-static FrameBuffer frame_buffer;
-
-// UDP Socket setup
-int setup_udp_socket(int port) {
-    int sock = socket(AF_INET, SOCK_DGRAM, 0);
-    if (sock < 0) {
-        perror("socket creation failed");
-        return -1;
-    }
-    
-    // Enable address reuse
-    int optval = 1;
-    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
-    
-    // Set non-blocking
-    int flags = fcntl(sock, F_GETFL, 0);
-    fcntl(sock, F_SETFL, flags | O_NONBLOCK);
-    
-    // Bind to port
-    sockaddr_in addr{};
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(port);
-    addr.sin_addr.s_addr = INADDR_ANY;
-    
-    if (bind(sock, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) < 0) {
-        perror("bind failed");
-        close(sock);
-        return -1;
-    }
-    
-    return sock;
+// Signal handler for graceful shutdown
+void signalHandler(int signum) {
+    cout << "\n[Main] Received signal " << signum << ", shutting down gracefully..." << endl;
+    shutdown_requested = true;
+    running = false;
 }
 
-// Packet structure
-struct VideoPacket {
-    uint16_t frame_id;
-    uint8_t chunk_id;
-    uint8_t total_chunks;
-    uint8_t data[CHUNK_SIZE];
-};
-
-// Sender thread
-void udp_send_thread(const string& target_ip, int target_port, int local_port) {
-    cout << "[SENDER] Starting sender thread on port " << local_port << endl;
+// Frame display callback
+void onFrameReceived(const vector<uint8_t>& frame_data, uint32_t frame_id) {
+    static H264Decoder decoder;
+    static Mat display_frame;
     
-    // Setup camera
-    VideoCapture cap(0); // Try default camera first
-    if (!cap.isOpened()) {
-        cap.open(1); // Try second camera
+    // Decode frame
+    if (decoder.decode(frame_data, display_frame)) {
+        // Display frame
+        imshow("NovaEngine - Received Frame", display_frame);
+        waitKey(1);
+        
+        cout << "[Main] Displayed frame " << frame_id << " (" << frame_data.size() << " bytes)" << endl;
     }
-    if (!cap.isOpened()) {
-        cerr << "[SENDER] Failed to open camera. Trying without camera..." << endl;
-        // Continue without camera for testing
-    } else {
-        cap.set(CAP_PROP_FRAME_WIDTH, 640);
-        cap.set(CAP_PROP_FRAME_HEIGHT, 480);
-        cap.set(CAP_PROP_FPS, 30);
-        cout << "[SENDER] Camera opened successfully" << endl;
-    }
-    
-    // Setup encoder
-    FFmpegEncoder encoder(640, 480, 30, 600000);
-    
-    // Setup target address
-    sockaddr_in target_addr{};
-    target_addr.sin_family = AF_INET;
-    target_addr.sin_port = htons(target_port);
-    inet_pton(AF_INET, target_ip.c_str(), &target_addr.sin_addr);
-    
-    uint16_t frame_id = 0;
-    Mat frame;
-    
-    while (running) {
-        if (cap.isOpened()) {
-            cap.read(frame);
-            if (frame.empty()) continue;
-        } else {
-            // Generate test frame if no camera
-            frame = Mat(480, 640, CV_8UC3, Scalar(0, 255, 0)); // Green frame
-            putText(frame, "Test Frame " + to_string(frame_id), Point(50, 240), 
-                   FONT_HERSHEY_SIMPLEX, 2, Scalar(255, 255, 255), 3);
-        }
-        
-        // Encode frame
-        vector<uint8_t> encoded_data;
-        if (!encoder.encodeFrame(frame, encoded_data)) continue;
-        
-        // Pad encoded data to fit exactly in K_CHUNKS * CHUNK_SIZE
-        size_t total_size = K_CHUNKS * CHUNK_SIZE;
-        if (encoded_data.size() < total_size) {
-            encoded_data.resize(total_size, 0);
-        }
-        
-        // Split into K data chunks
-        vector<vector<uint8_t>> data_chunks(K_CHUNKS);
-        for (int i = 0; i < K_CHUNKS; ++i) {
-            data_chunks[i].resize(CHUNK_SIZE);
-            memcpy(data_chunks[i].data(), 
-                   encoded_data.data() + i * CHUNK_SIZE, 
-                   CHUNK_SIZE);
-        }
-        
-        // Generate R parity chunks using Reed-Solomon FEC
-        char** data_ptrs = new char*[K_CHUNKS];
-        char** coding_ptrs = new char*[R_CHUNKS];
-        
-        for (int i = 0; i < K_CHUNKS; ++i) {
-            data_ptrs[i] = reinterpret_cast<char*>(data_chunks[i].data());
-        }
-        
-        for (int i = 0; i < R_CHUNKS; ++i) {
-            coding_ptrs[i] = new char[CHUNK_SIZE];
-        }
-        
-        // Perform FEC encoding
-        jerasure_matrix_encode(K_CHUNKS, R_CHUNKS, 8, rs_matrix, 
-                              data_ptrs, coding_ptrs, CHUNK_SIZE);
-        
-        // Send all K+R chunks
-        for (int i = 0; i < TOTAL_CHUNKS; ++i) {
-            VideoPacket pkt{};
-            pkt.frame_id = frame_id;
-            pkt.chunk_id = i;
-            pkt.total_chunks = TOTAL_CHUNKS;
-            
-            if (i < K_CHUNKS) {
-                // Data chunk
-                memcpy(pkt.data, data_ptrs[i], CHUNK_SIZE);
-            } else {
-                // Parity chunk
-                memcpy(pkt.data, coding_ptrs[i - K_CHUNKS], CHUNK_SIZE);
-            }
-            
-            // Send chunk
-            ssize_t sent = sendto(udp_socket, &pkt, sizeof(VideoPacket), 0,
-                                reinterpret_cast<sockaddr*>(&target_addr), sizeof(target_addr));
-            
-            if (sent < 0) {
-                cerr << "[SENDER] Send failed: " << strerror(errno) << endl;
-            } else {
-                cout << "[SENDER] Sent frame " << frame_id << " chunk " << i << "/" << TOTAL_CHUNKS << endl;
-            }
-        }
-        
-        // Cleanup
-        for (int i = 0; i < R_CHUNKS; ++i) {
-            delete[] coding_ptrs[i];
-        }
-        delete[] data_ptrs;
-        delete[] coding_ptrs;
-        
-        frame_id++;
-        this_thread::sleep_for(chrono::milliseconds(33)); // ~30 FPS
-    }
-    
-    cout << "[SENDER] Sender thread stopped" << endl;
 }
 
-// Receiver thread
-void udp_receive_thread() {
-    cout << "[RECEIVER] Starting receiver thread" << endl;
-    
-    H264Decoder decoder;
-    Mat decoded_frame;
-    uint8_t recv_buffer[sizeof(VideoPacket)];
+// Network adaptation thread
+void networkAdaptationThread() {
+    cout << "[Main] Network adaptation thread started" << endl;
     
     while (running) {
-        // Cleanup expired frames
-        frame_buffer.cleanup_expired();
+        // Simulate network monitoring (in real implementation, this would query actual network metrics)
+        double network_kbps = 3000.0;  // Simulated network capacity
+        double loss_ratio = 0.02;      // Simulated 2% loss
         
-        // Receive packet
-        sockaddr_in sender_addr{};
-        socklen_t addr_len = sizeof(sender_addr);
+        // Adapt encoder to network conditions
+        adaptEncoderToNetwork(network_kbps, loss_ratio);
         
-        ssize_t received = recvfrom(udp_socket, recv_buffer, sizeof(recv_buffer), 0,
-                                  reinterpret_cast<sockaddr*>(&sender_addr), &addr_len);
+        // Update scheduler metrics
+        vector<PathStats> path_stats;
+        path_stats.emplace_back("127.0.0.1", 5001, 25.0, 0.01);
+        path_stats.emplace_back("127.0.0.1", 5002, 30.0, 0.02);
+        path_stats.emplace_back("127.0.0.1", 5003, 35.0, 0.03);
         
-        if (received == sizeof(VideoPacket)) {
-            VideoPacket* pkt = reinterpret_cast<VideoPacket*>(recv_buffer);
-            
-            cout << "[RECEIVER] Received frame " << pkt->frame_id << " chunk " << (int)pkt->chunk_id << "/" << (int)pkt->total_chunks << endl;
-            
-            // Extract chunk data
-            vector<uint8_t> chunk_data(pkt->data, pkt->data + CHUNK_SIZE);
-            
-            // Add to frame buffer
-            frame_buffer.add_chunk(pkt->frame_id, pkt->chunk_id, move(chunk_data));
-            
-            // Check if frame is complete
-            if (frame_buffer.can_decode_frame(pkt->frame_id)) {
-                cout << "[RECEIVER] Frame " << pkt->frame_id << " ready for FEC decode" << endl;
-                auto frame_data = frame_buffer.decode_frame(pkt->frame_id);
-                
-                cout << "[RECEIVER] Frame data size: " << frame_data.size() << " bytes" << endl;
-                
-                // Decode frame
-                if (!frame_data.empty() && decoder.decode(frame_data, decoded_frame)) {
-                    // Create split screen display
-                    Mat display_frame(480, 1280, CV_8UC3); // 1280x480 for split screen
-                    
-                    // Left side: Local camera (placeholder)
-                    Mat left_side = display_frame.colRange(0, 640);
-                    left_side.setTo(Scalar(0, 0, 0)); // Black background
-                    putText(left_side, "Local Camera", Point(200, 240), 
-                           FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 255, 255), 2);
-                    
-                    // Right side: Remote video
-                    if (!decoded_frame.empty()) {
-                        Mat resized_remote;
-                        cv::resize(decoded_frame, resized_remote, cv::Size(640, 480));
-                        resized_remote.copyTo(display_frame.colRange(640, 1280));
-                    } else {
-                        Mat right_side = display_frame.colRange(640, 1280);
-                        right_side.setTo(Scalar(0, 0, 0));
-                        putText(right_side, "Remote Camera", Point(200, 240), 
-                               FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 255, 255), 2);
-                    }
-                    
-                    // Display frame
-                    imshow("NovaEngine - Split Screen", display_frame);
-                    if (waitKey(1) == 27) { // ESC key
-                        running = false;
-                        break;
-                    }
-                }
-            }
-        } else if (received < 0 && errno != EAGAIN && errno != EWOULDBLOCK) {
-            cerr << "[RECEIVER] Recv error: " << strerror(errno) << endl;
-        }
+        updateSchedulerMetrics(path_stats);
         
-        this_thread::sleep_for(chrono::microseconds(100)); // Small delay
+        // Sleep for adaptation interval
+        this_thread::sleep_for(chrono::milliseconds(100));
     }
     
-    cout << "[RECEIVER] Receiver thread stopped" << endl;
+    cout << "[Main] Network adaptation thread stopped" << endl;
+}
+
+// Statistics monitoring thread
+void statisticsThread() {
+    cout << "[Main] Statistics monitoring thread started" << endl;
+    
+    while (running) {
+        // Get statistics from all components
+        auto encoder_stats = g_encoder->getStats();
+        auto scheduler_stats = g_scheduler->getStats();
+        auto collector_stats = g_collector->getStats();
+        auto sender_stats = g_sender_receiver->getStats();
+        
+        // Print statistics every 5 seconds
+        static int counter = 0;
+        if (++counter % 50 == 0) {  // 50 * 100ms = 5 seconds
+            cout << "\n=== NovaEngine Statistics ===" << endl;
+            cout << "Encoder: " << encoder_stats.frames_encoded << " frames, "
+                 << encoder_stats.avg_bitrate_kbps << " kbps, "
+                 << encoder_stats.current_fps << " fps" << endl;
+            cout << "Scheduler: " << scheduler_stats.total_chunks_sent << " chunks, "
+                 << scheduler_stats.avg_rtt_ms << "ms RTT, "
+                 << (scheduler_stats.avg_loss_ratio * 100) << "% loss" << endl;
+            cout << "Collector: " << collector_stats.frames_completed << "/" 
+                 << collector_stats.frames_received << " frames, "
+                 << collector_stats.avg_latency_ms << "ms latency" << endl;
+            cout << "Sender: " << sender_stats.frames_sent << " sent, "
+                 << sender_stats.frames_received << " received, "
+                 << sender_stats.throughput_mbps << " Mbps" << endl;
+            cout << "=============================" << endl;
+        }
+        
+        this_thread::sleep_for(chrono::milliseconds(100));
+    }
+    
+    cout << "[Main] Statistics monitoring thread stopped" << endl;
 }
 
 int main(int argc, char* argv[]) {
-    if (argc != 4) {
-        cerr << "Usage: " << argv[0] << " <local_port> <target_ip> <target_port>" << endl;
+    if (argc < 4) {
+        cout << "Usage: " << argv[0] << " <mode> <target_ip> <target_port> [local_port]" << endl;
+        cout << "  mode: sender, receiver, or both" << endl;
+        cout << "  target_ip: IP address of target" << endl;
+        cout << "  target_port: Port of target" << endl;
+        cout << "  local_port: Local port (optional, default: target_port+1)" << endl;
         return 1;
     }
     
-    int local_port = stoi(argv[1]);
+    string mode = argv[1];
     string target_ip = argv[2];
     int target_port = stoi(argv[3]);
+    int local_port = (argc > 4) ? stoi(argv[4]) : target_port + 1;
     
-    // Initialize Reed-Solomon FEC matrix
-    rs_matrix = reed_sol_vandermonde_coding_matrix(K_CHUNKS, R_CHUNKS, 8);
-    if (!rs_matrix) {
-        cerr << "Failed to create Reed-Solomon matrix" << endl;
+    // Set up signal handlers
+    signal(SIGINT, signalHandler);
+    signal(SIGTERM, signalHandler);
+    
+    cout << "=== NovaEngine Ultra Stream v1.0 ===" << endl;
+    cout << "Mode: " << mode << endl;
+    cout << "Target: " << target_ip << ":" << target_port << endl;
+    cout << "Local port: " << local_port << endl;
+    cout << "=====================================" << endl;
+    
+    try {
+        // Initialize all NovaEngine components
+        cout << "\n[Main] Initializing NovaEngine components..." << endl;
+        
+        // Initialize encoder (1280x720@30fps, 3Mbps)
+        initEncoder(1280, 720, 30, 3000);
+        
+        // Initialize slicer (1000 byte chunks, k=6, r=2)
+        initSlicer(1000, 6, 2);
+        
+        // Initialize erasure coder (k=6, r=2, 1000 byte chunks)
+        initErasureCoder(6, 2, 1000);
+        
+        // Initialize scheduler with multiple paths
+        vector<int> ports = {5001, 5002, 5003};
+        initScheduler(ports);
+        
+        // Initialize collector (50ms window, k=6, r=2)
+        initCollector(50, 6, 2);
+        
+        // Initialize sender/receiver
+        vector<int> local_ports = {local_port, local_port + 1, local_port + 2};
+        vector<int> target_ports = {target_port, target_port + 1, target_port + 2};
+        initSenderReceiver(local_ports, target_ip, target_ports);
+        
+        cout << "[Main] ✅ All components initialized successfully" << endl;
+        
+        // Set up frame receive callback
+        setReceiveCallback(onFrameReceived);
+        
+        // Start collector flush thread
+        startCollectorFlush(onFrameReceived);
+        
+        // Start sender/receiver
+        startSenderReceiver();
+        
+        // Start background threads
+        thread network_thread(networkAdaptationThread);
+        thread stats_thread(statisticsThread);
+        
+        if (mode == "sender" || mode == "both") {
+            cout << "\n[Main] Starting sender mode..." << endl;
+            
+            // Open camera
+            VideoCapture cap(0);
+            if (!cap.isOpened()) {
+                cerr << "[Main] Error: Could not open camera" << endl;
+                return 1;
+            }
+            
+            cap.set(CAP_PROP_FRAME_WIDTH, 1280);
+            cap.set(CAP_PROP_FRAME_HEIGHT, 720);
+            cap.set(CAP_PROP_FPS, 30);
+            
+            Mat frame;
+            uint32_t frame_id = 0;
+            
+            cout << "[Main] Sender loop started. Press 'q' to quit." << endl;
+            
+            while (running && !shutdown_requested) {
+                // Capture frame
+                cap.read(frame);
+                if (frame.empty()) {
+                    cerr << "[Main] Error: Empty frame from camera" << endl;
+                    continue;
+                }
+                
+                // Encode frame
+                vector<uint8_t> encoded_data;
+                if (encodeFrame(frame, encoded_data)) {
+                    // Send frame
+                    if (sendFrame(encoded_data, frame_id)) {
+                        cout << "[Main] Sent frame " << frame_id << " (" << encoded_data.size() << " bytes)" << endl;
+                    }
+                    frame_id++;
+                }
+                
+                // Display local frame
+                imshow("NovaEngine - Local Camera", frame);
+                
+                // Check for quit
+                char key = waitKey(1);
+                if (key == 'q' || key == 27) {
+                    shutdown_requested = true;
+                    break;
+                }
+                
+                // Frame rate control
+                this_thread::sleep_for(chrono::milliseconds(33));  // ~30 fps
+            }
+            
+            cap.release();
+        }
+        
+        if (mode == "receiver" || mode == "both") {
+            cout << "\n[Main] Starting receiver mode..." << endl;
+            
+            // Create a window for received frames
+            namedWindow("NovaEngine - Received Frame", WINDOW_AUTOSIZE);
+            
+            cout << "[Main] Receiver loop started. Press 'q' to quit." << endl;
+            
+            while (running && !shutdown_requested) {
+                // Check for quit
+                char key = waitKey(1);
+                if (key == 'q' || key == 27) {
+                    shutdown_requested = true;
+                    break;
+                }
+                
+                this_thread::sleep_for(chrono::milliseconds(10));
+            }
+        }
+        
+        // Wait for background threads
+        if (network_thread.joinable()) {
+            network_thread.join();
+        }
+        if (stats_thread.joinable()) {
+            stats_thread.join();
+        }
+        
+    } catch (const exception& e) {
+        cerr << "[Main] Error: " << e.what() << endl;
         return 1;
     }
-    
-    cout << "[FEC] Initialized Reed-Solomon FEC (k=" << K_CHUNKS << ", r=" << R_CHUNKS << ")" << endl;
-    
-    // Setup UDP socket
-    udp_socket = setup_udp_socket(local_port);
-    if (udp_socket < 0) {
-        cerr << "Failed to setup UDP socket" << endl;
-        free(rs_matrix);
-        return 1;
-    }
-    
-    cout << "NovaEngine starting on port " << local_port 
-         << ", sending to " << target_ip << ":" << target_port << endl;
-    
-    // Start threads
-    thread sender_thread(udp_send_thread, target_ip, target_port, local_port);
-    thread receiver_thread(udp_receive_thread);
-    
-    // Wait for threads
-    sender_thread.join();
-    receiver_thread.join();
     
     // Cleanup
-    if (udp_socket >= 0) close(udp_socket);
-    if (rs_matrix) free(rs_matrix);
+    cout << "\n[Main] Shutting down NovaEngine..." << endl;
+    
+    stopSenderReceiver();
+    shutdownSenderReceiver();
+    shutdownCollector();
+    shutdownScheduler();
+    shutdownErasureCoder();
+    shutdownSlicer();
+    shutdownEncoder();
+    
     destroyAllWindows();
     
-    cout << "NovaEngine stopped" << endl;
+    cout << "[Main] NovaEngine shutdown complete" << endl;
     return 0;
 }
 

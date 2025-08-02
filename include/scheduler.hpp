@@ -1,34 +1,78 @@
 #pragma once
 
-#include <string>
+#include "udp_sender.hpp"
 #include <vector>
 #include <random>
+#include <chrono>
+#include <atomic>
+#include <thread>
+#include <mutex>
 
-struct PathStats {
-    std::string ip;
-    int port;
-    double rtt_ms;
-    double loss_ratio;
-    int weight;
+// NovaEngine Ultra Stream - Adaptive Weighted Scheduler
+// RTT and loss-based path selection for optimal video delivery
 
-    PathStats(const std::string& ip, int port, double rtt, double loss);
-};
-
-class WeightedScheduler {
+class AdaptiveScheduler {
 public:
-    explicit WeightedScheduler(const std::vector<PathStats>& paths);
-    PathStats select_path();
-    void update_metrics(const std::vector<PathStats>& paths);
+    AdaptiveScheduler(const std::vector<PathStats>& paths);
+    ~AdaptiveScheduler();
+    
+    // Select optimal path for chunk transmission
+    PathStats selectPath();
+    
+    // Update path metrics (RTT, loss, bandwidth)
+    void updateMetrics(const std::vector<PathStats>& new_stats);
+    
+    // Get current path statistics
+    std::vector<PathStats> getPathStats() const;
+    
+    // Start background metric collection
+    void startMetricCollection();
+    
+    // Stop metric collection
+    void stopMetricCollection();
+    
+    // Set metric update interval (default: 50ms)
+    void setUpdateInterval(int ms);
+    
+    // Get scheduler statistics
+    struct SchedulerStats {
+        uint64_t total_chunks_sent;
+        uint64_t chunks_per_path[16];  // Max 16 paths
+        double avg_rtt_ms;
+        double avg_loss_ratio;
+        uint64_t last_update;
+    };
+    
+    SchedulerStats getStats() const;
 
 private:
     std::vector<PathStats> paths_;
     std::vector<int> cumulative_weights_;
-    int total_weight = 0;
-    std::mt19937 rng;
-
-    void build_weight_table();
+    int total_weight_;
+    std::mt19937 rng_;
+    std::atomic<bool> running_;
+    std::thread metric_thread_;
+    std::chrono::milliseconds update_interval_;
+    mutable std::mutex stats_mutex_;
+    SchedulerStats stats_;
+    
+    // Rebuild weight table based on current metrics
+    void rebuildWeightTable();
+    
+    // Background metric collection thread
+    void metricCollectionThread();
+    
+    // Calculate path weight based on RTT and loss
+    int calculateWeight(double rtt_ms, double loss_ratio) const;
+    
+    // Update internal statistics
+    void updateStatistics();
 };
 
-// 🔥 Global olarak seçimi kolaylaştıran interface
-void init_scheduler(const std::vector<int>& ports); // Basit RTT bilmeden başlatmak için
-int select_port_for_chunk(int chunk_id);
+// Global scheduler interface
+extern AdaptiveScheduler* g_scheduler;
+
+void initScheduler(const std::vector<int>& ports);
+PathStats selectPathForChunk(int chunk_id);
+void updateSchedulerMetrics(const std::vector<PathStats>& stats);
+void shutdownScheduler();

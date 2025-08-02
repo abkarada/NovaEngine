@@ -13,8 +13,6 @@ file(REMOVE_RECURSE
   "CMakeFiles/novaengine.dir/src/loss_tracker.cpp.o.d"
   "CMakeFiles/novaengine.dir/src/main.cpp.o"
   "CMakeFiles/novaengine.dir/src/main.cpp.o.d"
-  "CMakeFiles/novaengine.dir/src/packet_parser.cpp.o"
-  "CMakeFiles/novaengine.dir/src/packet_parser.cpp.o.d"
   "CMakeFiles/novaengine.dir/src/ping_handler.cpp.o"
   "CMakeFiles/novaengine.dir/src/ping_handler.cpp.o.d"
   "CMakeFiles/novaengine.dir/src/ping_sender.cpp.o"

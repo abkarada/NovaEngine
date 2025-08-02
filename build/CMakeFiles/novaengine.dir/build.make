@@ -153,24 +153,10 @@ CMakeFiles/novaengine.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/novaengine.dir/src/main.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ryuzaki/Desktop/NovaEngine/src/main.cpp -o CMakeFiles/novaengine.dir/src/main.cpp.s
 
-CMakeFiles/novaengine.dir/src/packet_parser.cpp.o: CMakeFiles/novaengine.dir/flags.make
-CMakeFiles/novaengine.dir/src/packet_parser.cpp.o: ../src/packet_parser.cpp
-CMakeFiles/novaengine.dir/src/packet_parser.cpp.o: CMakeFiles/novaengine.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/novaengine.dir/src/packet_parser.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/novaengine.dir/src/packet_parser.cpp.o -MF CMakeFiles/novaengine.dir/src/packet_parser.cpp.o.d -o CMakeFiles/novaengine.dir/src/packet_parser.cpp.o -c /home/ryuzaki/Desktop/NovaEngine/src/packet_parser.cpp
-
-CMakeFiles/novaengine.dir/src/packet_parser.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/novaengine.dir/src/packet_parser.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ryuzaki/Desktop/NovaEngine/src/packet_parser.cpp > CMakeFiles/novaengine.dir/src/packet_parser.cpp.i
-
-CMakeFiles/novaengine.dir/src/packet_parser.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/novaengine.dir/src/packet_parser.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ryuzaki/Desktop/NovaEngine/src/packet_parser.cpp -o CMakeFiles/novaengine.dir/src/packet_parser.cpp.s
-
 CMakeFiles/novaengine.dir/src/ping_handler.cpp.o: CMakeFiles/novaengine.dir/flags.make
 CMakeFiles/novaengine.dir/src/ping_handler.cpp.o: ../src/ping_handler.cpp
 CMakeFiles/novaengine.dir/src/ping_handler.cpp.o: CMakeFiles/novaengine.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/novaengine.dir/src/ping_handler.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/novaengine.dir/src/ping_handler.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/novaengine.dir/src/ping_handler.cpp.o -MF CMakeFiles/novaengine.dir/src/ping_handler.cpp.o.d -o CMakeFiles/novaengine.dir/src/ping_handler.cpp.o -c /home/ryuzaki/Desktop/NovaEngine/src/ping_handler.cpp
 
 CMakeFiles/novaengine.dir/src/ping_handler.cpp.i: cmake_force
@@ -184,7 +170,7 @@ CMakeFiles/novaengine.dir/src/ping_handler.cpp.s: cmake_force
 CMakeFiles/novaengine.dir/src/ping_sender.cpp.o: CMakeFiles/novaengine.dir/flags.make
 CMakeFiles/novaengine.dir/src/ping_sender.cpp.o: ../src/ping_sender.cpp
 CMakeFiles/novaengine.dir/src/ping_sender.cpp.o: CMakeFiles/novaengine.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/novaengine.dir/src/ping_sender.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/novaengine.dir/src/ping_sender.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/novaengine.dir/src/ping_sender.cpp.o -MF CMakeFiles/novaengine.dir/src/ping_sender.cpp.o.d -o CMakeFiles/novaengine.dir/src/ping_sender.cpp.o -c /home/ryuzaki/Desktop/NovaEngine/src/ping_sender.cpp
 
 CMakeFiles/novaengine.dir/src/ping_sender.cpp.i: cmake_force
@@ -198,7 +184,7 @@ CMakeFiles/novaengine.dir/src/ping_sender.cpp.s: cmake_force
 CMakeFiles/novaengine.dir/src/rtt_monitor.cpp.o: CMakeFiles/novaengine.dir/flags.make
 CMakeFiles/novaengine.dir/src/rtt_monitor.cpp.o: ../src/rtt_monitor.cpp
 CMakeFiles/novaengine.dir/src/rtt_monitor.cpp.o: CMakeFiles/novaengine.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/novaengine.dir/src/rtt_monitor.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/novaengine.dir/src/rtt_monitor.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/novaengine.dir/src/rtt_monitor.cpp.o -MF CMakeFiles/novaengine.dir/src/rtt_monitor.cpp.o.d -o CMakeFiles/novaengine.dir/src/rtt_monitor.cpp.o -c /home/ryuzaki/Desktop/NovaEngine/src/rtt_monitor.cpp
 
 CMakeFiles/novaengine.dir/src/rtt_monitor.cpp.i: cmake_force
@@ -212,7 +198,7 @@ CMakeFiles/novaengine.dir/src/rtt_monitor.cpp.s: cmake_force
 CMakeFiles/novaengine.dir/src/scheduler.cpp.o: CMakeFiles/novaengine.dir/flags.make
 CMakeFiles/novaengine.dir/src/scheduler.cpp.o: ../src/scheduler.cpp
 CMakeFiles/novaengine.dir/src/scheduler.cpp.o: CMakeFiles/novaengine.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/novaengine.dir/src/scheduler.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/novaengine.dir/src/scheduler.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/novaengine.dir/src/scheduler.cpp.o -MF CMakeFiles/novaengine.dir/src/scheduler.cpp.o.d -o CMakeFiles/novaengine.dir/src/scheduler.cpp.o -c /home/ryuzaki/Desktop/NovaEngine/src/scheduler.cpp
 
 CMakeFiles/novaengine.dir/src/scheduler.cpp.i: cmake_force
@@ -226,7 +212,7 @@ CMakeFiles/novaengine.dir/src/scheduler.cpp.s: cmake_force
 CMakeFiles/novaengine.dir/src/sender_receiver.cpp.o: CMakeFiles/novaengine.dir/flags.make
 CMakeFiles/novaengine.dir/src/sender_receiver.cpp.o: ../src/sender_receiver.cpp
 CMakeFiles/novaengine.dir/src/sender_receiver.cpp.o: CMakeFiles/novaengine.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/novaengine.dir/src/sender_receiver.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/novaengine.dir/src/sender_receiver.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/novaengine.dir/src/sender_receiver.cpp.o -MF CMakeFiles/novaengine.dir/src/sender_receiver.cpp.o.d -o CMakeFiles/novaengine.dir/src/sender_receiver.cpp.o -c /home/ryuzaki/Desktop/NovaEngine/src/sender_receiver.cpp
 
 CMakeFiles/novaengine.dir/src/sender_receiver.cpp.i: cmake_force
@@ -240,7 +226,7 @@ CMakeFiles/novaengine.dir/src/sender_receiver.cpp.s: cmake_force
 CMakeFiles/novaengine.dir/src/slicer.cpp.o: CMakeFiles/novaengine.dir/flags.make
 CMakeFiles/novaengine.dir/src/slicer.cpp.o: ../src/slicer.cpp
 CMakeFiles/novaengine.dir/src/slicer.cpp.o: CMakeFiles/novaengine.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/novaengine.dir/src/slicer.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/novaengine.dir/src/slicer.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/novaengine.dir/src/slicer.cpp.o -MF CMakeFiles/novaengine.dir/src/slicer.cpp.o.d -o CMakeFiles/novaengine.dir/src/slicer.cpp.o -c /home/ryuzaki/Desktop/NovaEngine/src/slicer.cpp
 
 CMakeFiles/novaengine.dir/src/slicer.cpp.i: cmake_force
@@ -254,7 +240,7 @@ CMakeFiles/novaengine.dir/src/slicer.cpp.s: cmake_force
 CMakeFiles/novaengine.dir/src/smart_collector.cpp.o: CMakeFiles/novaengine.dir/flags.make
 CMakeFiles/novaengine.dir/src/smart_collector.cpp.o: ../src/smart_collector.cpp
 CMakeFiles/novaengine.dir/src/smart_collector.cpp.o: CMakeFiles/novaengine.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/novaengine.dir/src/smart_collector.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/novaengine.dir/src/smart_collector.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/novaengine.dir/src/smart_collector.cpp.o -MF CMakeFiles/novaengine.dir/src/smart_collector.cpp.o.d -o CMakeFiles/novaengine.dir/src/smart_collector.cpp.o -c /home/ryuzaki/Desktop/NovaEngine/src/smart_collector.cpp
 
 CMakeFiles/novaengine.dir/src/smart_collector.cpp.i: cmake_force
@@ -268,7 +254,7 @@ CMakeFiles/novaengine.dir/src/smart_collector.cpp.s: cmake_force
 CMakeFiles/novaengine.dir/src/udp_sender.cpp.o: CMakeFiles/novaengine.dir/flags.make
 CMakeFiles/novaengine.dir/src/udp_sender.cpp.o: ../src/udp_sender.cpp
 CMakeFiles/novaengine.dir/src/udp_sender.cpp.o: CMakeFiles/novaengine.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/novaengine.dir/src/udp_sender.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/novaengine.dir/src/udp_sender.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/novaengine.dir/src/udp_sender.cpp.o -MF CMakeFiles/novaengine.dir/src/udp_sender.cpp.o.d -o CMakeFiles/novaengine.dir/src/udp_sender.cpp.o -c /home/ryuzaki/Desktop/NovaEngine/src/udp_sender.cpp
 
 CMakeFiles/novaengine.dir/src/udp_sender.cpp.i: cmake_force
@@ -287,7 +273,6 @@ novaengine_OBJECTS = \
 "CMakeFiles/novaengine.dir/src/ffmpeg_encoder.cpp.o" \
 "CMakeFiles/novaengine.dir/src/loss_tracker.cpp.o" \
 "CMakeFiles/novaengine.dir/src/main.cpp.o" \
-"CMakeFiles/novaengine.dir/src/packet_parser.cpp.o" \
 "CMakeFiles/novaengine.dir/src/ping_handler.cpp.o" \
 "CMakeFiles/novaengine.dir/src/ping_sender.cpp.o" \
 "CMakeFiles/novaengine.dir/src/rtt_monitor.cpp.o" \
@@ -306,7 +291,6 @@ novaengine_EXTERNAL_OBJECTS =
 ../bin/novaengine: CMakeFiles/novaengine.dir/src/ffmpeg_encoder.cpp.o
 ../bin/novaengine: CMakeFiles/novaengine.dir/src/loss_tracker.cpp.o
 ../bin/novaengine: CMakeFiles/novaengine.dir/src/main.cpp.o
-../bin/novaengine: CMakeFiles/novaengine.dir/src/packet_parser.cpp.o
 ../bin/novaengine: CMakeFiles/novaengine.dir/src/ping_handler.cpp.o
 ../bin/novaengine: CMakeFiles/novaengine.dir/src/ping_sender.cpp.o
 ../bin/novaengine: CMakeFiles/novaengine.dir/src/rtt_monitor.cpp.o
@@ -351,10 +335,6 @@ novaengine_EXTERNAL_OBJECTS =
 ../bin/novaengine: /usr/lib/x86_64-linux-gnu/libopencv_wechat_qrcode.so.4.5.4d
 ../bin/novaengine: /usr/lib/x86_64-linux-gnu/libopencv_xobjdetect.so.4.5.4d
 ../bin/novaengine: /usr/lib/x86_64-linux-gnu/libopencv_xphoto.so.4.5.4d
-../bin/novaengine: /usr/lib/x86_64-linux-gnu/libavcodec.so
-../bin/novaengine: /usr/lib/x86_64-linux-gnu/libavutil.so
-../bin/novaengine: /usr/lib/x86_64-linux-gnu/libswscale.so
-../bin/novaengine: /usr/lib/x86_64-linux-gnu/libavformat.so
 ../bin/novaengine: /usr/local/lib/libJerasure.so
 ../bin/novaengine: /usr/lib/x86_64-linux-gnu/libgf_complete.so
 ../bin/novaengine: /usr/lib/x86_64-linux-gnu/libopencv_highgui.so.4.5.4d
@@ -377,7 +357,7 @@ novaengine_EXTERNAL_OBJECTS =
 ../bin/novaengine: /usr/lib/x86_64-linux-gnu/libopencv_imgproc.so.4.5.4d
 ../bin/novaengine: /usr/lib/x86_64-linux-gnu/libopencv_core.so.4.5.4d
 ../bin/novaengine: CMakeFiles/novaengine.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Linking CXX executable ../bin/novaengine"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/ryuzaki/Desktop/NovaEngine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Linking CXX executable ../bin/novaengine"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/novaengine.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
