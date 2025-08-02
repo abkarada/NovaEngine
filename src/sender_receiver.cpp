@@ -156,20 +156,11 @@ SenderReceiver::SRStats SenderReceiver::getStats() const {
 void SenderReceiver::senderThread() {
     std::cout << "[SenderReceiver] Sender thread started" << std::endl;
     
-    uint32_t frame_counter = 0;
-    std::random_device rd;
-    std::mt19937 gen(rd());
+    // Camera capture is now handled in main.cpp
+    // This thread only handles network coordination
     
     while (running_) {
-        // Generate test frame data
-        std::vector<uint8_t> frame_data = generateTestFrame(frame_counter);
-        
-        // Send frame
-        if (sendFrame(frame_data, frame_counter)) {
-            frame_counter++;
-        }
-        
-        // Send every 100ms (10fps)
+        // Network coordination and monitoring
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     
