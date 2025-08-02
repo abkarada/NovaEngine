@@ -1,7 +1,0 @@
-# ninja log v6
-1	542	1753432339739832158	CMakeFiles/novaengine.dir/src/image.cpp.o	617e5d909703ceb
-1250	1513	1753447440582550410	/home/ryuzaki/Desktop/NoveEngine/bin/novaengine	a6807564298a25ff
-1	1029	1753443199433544659	CMakeFiles/novaengine.dir/src/ffmpeg_encoder.cpp.o	3c1c2acb72f82a6d
-6	1429	1753465318464158676	CMakeFiles/novaengine.dir/src/main.cpp.o	f4a93b767ae8e567
-2	143	1753444907821613826	CMakeFiles/novaengine.dir/src/slicer.cpp.o	47575fbba8a24e04
-7	426	1753465318464158676	CMakeFiles/novaengine.dir/src/udp_sender.cpp.o	a44fbe5b0a9056da

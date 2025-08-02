@@ -1,1 +1,0 @@
-// Proje genelinde kullanılacak loglama sistemi 

@@ -1,1 +1,0 @@
-// Video encode işlemleri header dosyası 

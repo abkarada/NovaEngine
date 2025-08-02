@@ -1,1 +1,0 @@
-// Adaptif path seçimi header dosyası 

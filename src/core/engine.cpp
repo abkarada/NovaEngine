@@ -1,1 +1,0 @@
-// Ana motor sınıfı, tüm modülleri yönetir 
