@@ -24,16 +24,26 @@ void H264Decoder::init() {
 }
 
 bool H264Decoder::decode(const std::vector<uint8_t>& encoded_data, cv::Mat& output_frame) {
-    if (!codec_ctx || !frame || !packet) return false;
+    if (!codec_ctx || !frame || !packet) {
+        std::cerr << "[DECODER] Decoder not initialized!" << std::endl;
+        return false;
+    }
+
+    std::cout << "[DECODER] Attempting to decode " << encoded_data.size() << " bytes" << std::endl;
 
     av_packet_unref(packet);
     packet->data = const_cast<uint8_t*>(encoded_data.data());
     packet->size = encoded_data.size();
 
-    if (avcodec_send_packet(codec_ctx, packet) < 0)
+    if (avcodec_send_packet(codec_ctx, packet) < 0) {
+        std::cerr << "[DECODER] Failed to send packet to decoder" << std::endl;
         return false;
+    }
 
     if (avcodec_receive_frame(codec_ctx, frame) == 0) {
+        std::cout << "[DECODER] Successfully decoded frame: " 
+                 << frame->width << "x" << frame->height << std::endl;
+        
         sws_ctx = sws_getCachedContext(
             sws_ctx,
             frame->width, frame->height, static_cast<AVPixelFormat>(frame->format),
@@ -46,7 +56,11 @@ bool H264Decoder::decode(const std::vector<uint8_t>& encoded_data, cv::Mat& outp
         int dest_stride[1] = { static_cast<int>(output_frame.step) };
 
         sws_scale(sws_ctx, frame->data, frame->linesize, 0, frame->height, dest, dest_stride);
+        std::cout << "[DECODER] Frame converted to OpenCV format: " 
+                 << output_frame.cols << "x" << output_frame.rows << std::endl;
         return true;
+    } else {
+        std::cerr << "[DECODER] Failed to receive frame from decoder" << std::endl;
     }
 
     return false;

@@ -151,12 +151,39 @@ void run_sender(const string& target_ip, const vector<int>& target_ports) {
     FFmpegEncoder encoder(width, height, fps, bitrate);
     uint16_t frame_id = 0;
     Mat frame;
-    ErasureCoder fec(8, 4); // k = 8, r = 4
+    ErasureCoder fec(3, 0); // k = 3, r = 0 (no FEC, simple packet collection)
 
     // Enhanced network monitoring
     RTTMonitor rtt_monitor;
     LossTracker loss_tracker;
     AdaptiveBitrateController bitrate_controller(bitrate, fps);
+
+    // Set up bidirectional receive callback for sender
+    set_sender_callback([&](const ChunkPacket& pkt, int socket_id) {
+        // Handle incoming ACK packets
+        cout << "[sender] Received packet on socket " << socket_id 
+             << " (frame " << pkt.frame_id << ", chunk " << (int)pkt.chunk_id << ")" << endl;
+        
+        // Calculate RTT if this is an ACK packet
+        if (pkt.timestamp > 0) {
+            auto now_us = chrono::duration_cast<chrono::microseconds>(
+                Clock::now().time_since_epoch()).count();
+            auto rtt_us = now_us - pkt.timestamp;
+            auto rtt_ms = rtt_us / 1000.0;
+            
+            // Update RTT monitor
+            rtt_monitor.receivePong(target_ports[socket_id], pkt.timestamp);
+            
+            // Log RTT occasionally
+            static int rtt_log_counter = 0;
+            if (++rtt_log_counter % 50 == 0) {
+                cout << "[sender] Socket " << socket_id << " RTT: " << rtt_ms << "ms" << endl;
+            }
+        }
+    });
+
+    // Start bidirectional receive for sender
+    start_bidirectional_receive();
 
     chrono::milliseconds frame_duration(1000 / fps);
     double stats[FIELD_COUNT] = {0};
@@ -170,6 +197,8 @@ void run_sender(const string& target_ip, const vector<int>& target_ports) {
     
     // Network metrics collection
     auto metrics_start = Clock::now();
+
+    cout << "[sender] Starting bidirectional sender loop..." << endl;
 
     while (true) {
         auto t0 = Clock::now();
@@ -186,20 +215,26 @@ void run_sender(const string& target_ip, const vector<int>& target_ports) {
             auto te1 = Clock::now();
             stats[ENCODE] += chrono::duration<double, milli>(te1 - te0).count();
 
+            cout << "[sender] Encoded frame " << frame_id << " to " << encoded.size() << " bytes" << endl;
+
             auto ts0 = Clock::now();
-            auto chunks = slice_frame(encoded, frame_id, 1000);
+            auto chunks = slice_frame(encoded, frame_id, 1000); // chunk_size = 1000
+            cout << "[sender] Sliced into " << chunks.size() << " chunks" << endl;
 
             vector<vector<uint8_t>> k_blocks;
-            for (int i = 0; i < 8 && i < chunks.size(); ++i)
+            for (int i = 0; i < 3 && i < chunks.size(); ++i) {
                 k_blocks.push_back(chunks[i].payload);
-
-            if (k_blocks.size() < 8) {
-                size_t block_size = k_blocks.empty() ? 0 : k_blocks[0].size();
-                k_blocks.resize(8, vector<uint8_t>(block_size, 0));
+                cout << "[sender] Chunk " << i << " size: " << chunks[i].payload.size() << endl;
+            }
+            // If less than k, pad with zeros (already chunk_size in slicing)
+            while (k_blocks.size() < 3) {
+                k_blocks.push_back(vector<uint8_t>(1000, 0));
+                cout << "[sender] Padded chunk to 1000 bytes (total " << k_blocks.size() << ")" << endl;
             }
 
             vector<vector<uint8_t>> all_blocks;
             fec.encode(k_blocks, all_blocks);
+            cout << "[sender] FEC encoded to " << all_blocks.size() << " blocks" << endl;
 
             // Enhanced multipath sending with weighted scheduling
             for (int i = 0; i < all_blocks.size(); ++i) {
@@ -216,14 +251,14 @@ void run_sender(const string& target_ip, const vector<int>& target_ports) {
                     loss_tracker.packetSent(p);
                 }
 
-                // Use enhanced multipath sending
-                ssize_t sent = send_udp_multipath(target_ip, target_ports, pkt);
+                // Use enhanced multipath sending: send each chunk on a different port (round robin)
+                int port_idx = i % target_ports.size();
+                ssize_t sent = send_udp(target_ip, target_ports[port_idx], pkt);
                 if (sent > 0) {
                     bytes_sent += sent;
                     packets_sent++;
-                    
                     // Track RTT for this path (using first port as representative)
-                    rtt_monitor.startPing(target_ports[0], pkt.timestamp);
+                    if (i == 0) rtt_monitor.startPing(target_ports[0], pkt.timestamp);
                 }
             }
 
@@ -271,6 +306,20 @@ void run_sender(const string& target_ip, const vector<int>& target_ports) {
         auto td1 = Clock::now();
         stats[DISPLAY] += chrono::duration<double, milli>(td1 - td0).count();
 
+        // Display received frame if in both mode
+        // if (has_received && !reconstructed_frame.empty()) { // This line is removed as per the edit hint
+        //     Mat display_frame;
+        //     Mat resized;
+        //     resize(reconstructed_frame, resized, Size(640, 480));
+        //     display_frame = resized;
+            
+        //     imshow("NovaEngine - Both Mode", display_frame);
+        //     if (waitKey(1) == 27) break;
+        // }
+
+        // Flush expired frames
+        // collector.flush_expired_frames(); // This line is removed as per the edit hint
+
         frame_count++;
         auto now = Clock::now();
         if (chrono::duration_cast<chrono::seconds>(now - stats_start).count() >= 1) {
@@ -292,6 +341,9 @@ void run_sender(const string& target_ip, const vector<int>& target_ports) {
         }
     }
 
+    // Stop bidirectional receive thread
+    stop_bidirectional_receive();
+    
     close_udp_sockets();
     destroyAllWindows();
 }
@@ -301,18 +353,24 @@ void run_receiver(const vector<int>& ports) {
     const int disp_width = 640;
     const int disp_height = 480;
 
-    vector<int> sockets;
-    for (int port : ports) {
-        int sock = socket(AF_INET, SOCK_DGRAM, 0);
-        sockaddr_in addr{};
-        addr.sin_family = AF_INET;
-        addr.sin_port = htons(port);
-        addr.sin_addr.s_addr = INADDR_ANY;
-        bind(sock, (sockaddr*)&addr, sizeof(addr));
-        fcntl(sock, F_SETFL, O_NONBLOCK);
-        sockets.push_back(sock);
-        cout << "Listening UDP " << port << endl;
+    // Use global sockets instead of creating new ones
+    // Don't reinitialize if already done
+    vector<int> sockets = get_global_sockets();
+    if (sockets.empty()) {
+        // Only initialize if not already done
+        if (!init_global_sockets(ports)) {
+            cerr << "[ERROR] Failed to initialize global sockets!" << endl;
+            return;
+        }
+        sockets = get_global_sockets();
     }
+    
+    if (sockets.empty()) {
+        cerr << "[ERROR] No sockets available!" << endl;
+        return;
+    }
+    
+    cout << "[receiver] Using " << sockets.size() << " global sockets for bidirectional I/O..." << endl;
 
     H264Decoder decoder;
     Mat reconstructed_frame;
@@ -322,35 +380,50 @@ void run_receiver(const vector<int>& ports) {
         if (decoder.decode(data, reconstructed_frame)) {
             has_received = true;
         }
-    }, 8, 4); // k = 8, r = 4
+    }, 3, 0); // k = 3, r = 0 (no FEC, simple packet collection)
 
-    cout << "Receiver started..." << endl;
+    // Set up bidirectional receive callback
+    set_receiver_callback([&](const ChunkPacket& pkt, int socket_id) {
+        // Handle incoming video packets
+        cout << "[receiver] Received packet on socket " << socket_id 
+             << " (frame " << pkt.frame_id << ", chunk " << (int)pkt.chunk_id 
+             << "/" << (int)pkt.total_chunks << ", size=" << pkt.payload.size() << ")" << endl;
+        
+        // Check if this is an ACK packet (small size and total_chunks=1)
+        if (pkt.total_chunks == 1 && pkt.payload.size() <= 10) {
+            cout << "[receiver] Ignoring ACK packet (frame=" << pkt.frame_id 
+                 << ", chunk=" << (int)pkt.chunk_id << ")" << endl;
+            return; // Don't process ACK packets
+        }
+        
+        // This is a video packet, send ACK back to sender
+        ChunkPacket ack_pkt;
+        ack_pkt.frame_id = pkt.frame_id;
+        ack_pkt.chunk_id = pkt.chunk_id;
+        ack_pkt.total_chunks = 1; // ACK packet
+        ack_pkt.timestamp = chrono::duration_cast<chrono::microseconds>(
+            Clock::now().time_since_epoch()).count();
+        ack_pkt.payload = {0x41, 0x43, 0x4B}; // "ACK"
+        
+        // Send ACK back to sender
+        send_udp("127.0.0.1", ports[socket_id], ack_pkt);
+        
+        // Process the video packet
+        cout << "[receiver] Processing VIDEO packet: frame=" << pkt.frame_id 
+             << ", chunk=" << (int)pkt.chunk_id << ", size=" << pkt.payload.size() << endl;
+        collector.handle(pkt);
+    });
+
+    // Start bidirectional receive thread
+    cout << "[receiver] Starting bidirectional receive..." << endl;
+    start_bidirectional_receive();
+
+    cout << "Receiver started with " << sockets.size() << " sockets in bidirectional mode..." << endl;
 
     while (true) {
-        for (int sock : sockets) {
-            uint8_t buf[MAX_BUFFER];
-            ssize_t len = recv(sock, buf, sizeof(buf), 0);
-            if (len >= 12) { // Updated minimum size for timestamp
-                auto pkt = parse_packet(buf, len);
-                
-                // Calculate RTT if timestamp is present
-                if (pkt.timestamp > 0) {
-                    auto now_us = chrono::duration_cast<chrono::microseconds>(
-                        Clock::now().time_since_epoch()).count();
-                    auto rtt_us = now_us - pkt.timestamp;
-                    auto rtt_ms = rtt_us / 1000.0;
-                    
-                    // Log RTT occasionally
-                    static int rtt_log_counter = 0;
-                    if (++rtt_log_counter % 100 == 0) {
-                        cout << "[RTT] Frame " << pkt.frame_id << " RTT: " << rtt_ms << "ms" << endl;
-                    }
-                }
-                
-                collector.handle(pkt);
-            }
-        }
-
+        // Main loop now only handles display and frame processing
+        // All packet receiving is handled by the bidirectional thread
+        
         collector.flush_expired_frames();
 
         Mat display_frame;
@@ -374,6 +447,9 @@ void run_receiver(const vector<int>& ports) {
         this_thread::sleep_for(chrono::milliseconds(1));
     }
 
-    for (int sock : sockets) close(sock);
+    // Stop bidirectional receive thread
+    stop_bidirectional_receive();
+    
+    // Don't close sockets here, they're managed globally
     destroyAllWindows();
 }

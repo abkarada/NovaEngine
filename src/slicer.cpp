@@ -19,7 +19,10 @@ std::vector<Chunk> slice_frame(const std::vector<uint8_t>& frame_data,
         c.chunk_id = static_cast<uint16_t>(i);
         c.total_chunks = static_cast<uint16_t>(total_chunks);
         c.payload.insert(c.payload.end(), frame_data.begin() + offset, frame_data.begin() + offset + len);
-
+        // Pad to chunk_size with zeros if needed
+        if (c.payload.size() < chunk_size) {
+            c.payload.resize(chunk_size, 0);
+        }
         chunks.push_back(std::move(c));
     }
 

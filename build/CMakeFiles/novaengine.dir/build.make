@@ -354,6 +354,7 @@ novaengine_EXTERNAL_OBJECTS =
 ../bin/novaengine: /usr/lib/x86_64-linux-gnu/libavcodec.so
 ../bin/novaengine: /usr/lib/x86_64-linux-gnu/libavutil.so
 ../bin/novaengine: /usr/lib/x86_64-linux-gnu/libswscale.so
+../bin/novaengine: /usr/lib/x86_64-linux-gnu/libavformat.so
 ../bin/novaengine: /usr/local/lib/libJerasure.so
 ../bin/novaengine: /usr/lib/x86_64-linux-gnu/libgf_complete.so
 ../bin/novaengine: /usr/lib/x86_64-linux-gnu/libopencv_highgui.so.4.5.4d

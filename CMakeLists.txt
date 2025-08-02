@@ -26,15 +26,23 @@ find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 target_link_libraries(novaengine ${OpenCV_LIBS})
 
-# FFmpeg
+# FFmpeg - Enhanced linking
 find_library(AVCODEC_LIB avcodec)
 find_library(AVUTIL_LIB avutil)
 find_library(SWSCALE_LIB swscale)
+find_library(AVFORMAT_LIB avformat)
 find_library(JERASURE_LIB Jerasure)
 find_library(GFCOMPLETE_LIB gf_complete)
 
-if(AVCODEC_LIB AND AVUTIL_LIB AND SWSCALE_LIB AND JERASURE_LIB AND GFCOMPLETE_LIB)
-    target_link_libraries(novaengine ${AVCODEC_LIB} ${AVUTIL_LIB} ${SWSCALE_LIB} ${JERASURE_LIB} ${GFCOMPLETE_LIB})
+if(AVCODEC_LIB AND AVUTIL_LIB AND SWSCALE_LIB AND AVFORMAT_LIB AND JERASURE_LIB AND GFCOMPLETE_LIB)
+    target_link_libraries(novaengine 
+        ${AVCODEC_LIB} 
+        ${AVUTIL_LIB} 
+        ${SWSCALE_LIB} 
+        ${AVFORMAT_LIB} 
+        ${JERASURE_LIB} 
+        ${GFCOMPLETE_LIB}
+    )
 else()
     message(FATAL_ERROR "FFmpeg or Jerasure libraries not found")
 endif()

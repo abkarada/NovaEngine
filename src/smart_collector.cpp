@@ -28,8 +28,11 @@ SmartFrameCollector::~SmartFrameCollector() {
 }
 
 void SmartFrameCollector::handle(ChunkPacket pkt) {
-    if (pkt.total_chunks == 0 || pkt.chunk_id >= pkt.total_chunks)
+    if (pkt.total_chunks == 0 || pkt.chunk_id >= pkt.total_chunks) {
+        std::cerr << "[COLLECTOR] Invalid packet: frame=" << pkt.frame_id 
+                 << ", chunk=" << (int)pkt.chunk_id << "/" << (int)pkt.total_chunks << std::endl;
         return;
+    }
 
     auto& frame = frame_buffer[pkt.frame_id];
 
@@ -39,33 +42,64 @@ void SmartFrameCollector::handle(ChunkPacket pkt) {
         frame.received_flags.resize(pkt.total_chunks, false);
         frame.total_chunks = pkt.total_chunks;
         frame.arrival_time = Clock::now();
+        std::cout << "[COLLECTOR] New frame " << pkt.frame_id 
+                 << " with " << pkt.total_chunks << " chunks" << std::endl;
     }
 
     // Duplicate check
-    if (frame.received_flags[pkt.chunk_id])
+    if (frame.received_flags[pkt.chunk_id]) {
+        std::cout << "[COLLECTOR] Duplicate chunk " << (int)pkt.chunk_id 
+                 << " for frame " << pkt.frame_id << std::endl;
         return;
+    }
 
     frame.chunks[pkt.chunk_id] = std::move(pkt.payload);
     frame.received_flags[pkt.chunk_id] = true;
     frame.received_chunks++;
     frame.last_update = Clock::now();
 
+    std::cout << "[COLLECTOR] Frame " << pkt.frame_id << ": " 
+             << frame.received_chunks << "/" << pkt.total_chunks 
+             << " chunks received" << std::endl;
+
     // Try to decode immediately if we have enough chunks
     if (frame.received_chunks >= static_cast<size_t>(k_)) {
+        std::cout << "[COLLECTOR] Attempting FEC decode for frame " << pkt.frame_id 
+                 << " (received: " << frame.received_chunks << "/" << pkt.total_chunks 
+                 << ", k=" << k_ << ", r=" << r_ << ")" << std::endl;
+        
         std::vector<uint8_t> recovered;
         if (fec.decode(frame.chunks, frame.received_flags, recovered)) {
+            std::cout << "[COLLECTOR] ✅ FEC decode SUCCESS for frame " << pkt.frame_id 
+                     << ", recovered " << recovered.size() << " bytes" << std::endl;
+            
             // Check frame age before delivering
             auto now = Clock::now();
             auto frame_age = std::chrono::duration_cast<std::chrono::milliseconds>(
                 now - frame.arrival_time).count();
             
             if (frame_age < MAX_FRAME_AGE_MS) {
+                std::cout << "[COLLECTOR] 🎯 Delivering frame " << pkt.frame_id 
+                         << " to decoder (age: " << frame_age << "ms)" << std::endl;
                 callback(recovered);
             } else {
-                std::cerr << "[COLLECTOR] Dropping old frame " << pkt.frame_id 
+                std::cerr << "[COLLECTOR] ❌ Dropping old frame " << pkt.frame_id 
                          << " (age: " << frame_age << "ms)" << std::endl;
             }
             frame_buffer.erase(pkt.frame_id);
+        } else {
+            std::cerr << "[COLLECTOR] ❌ FEC decode FAILED for frame " << pkt.frame_id 
+                     << " (received: " << frame.received_chunks << "/" << pkt.total_chunks << ")" << std::endl;
+            
+            // Log which chunks are missing
+            std::string missing_chunks;
+            for (size_t i = 0; i < frame.received_flags.size(); ++i) {
+                if (!frame.received_flags[i]) {
+                    if (!missing_chunks.empty()) missing_chunks += ", ";
+                    missing_chunks += std::to_string(i);
+                }
+            }
+            std::cout << "[COLLECTOR] Missing chunks: [" << missing_chunks << "]" << std::endl;
         }
     }
 }

@@ -18,6 +18,9 @@
 AVCODEC_LIB:FILEPATH=/usr/lib/x86_64-linux-gnu/libavcodec.so
 
 //Path to a library.
+AVFORMAT_LIB:FILEPATH=/usr/lib/x86_64-linux-gnu/libavformat.so
+
+//Path to a library.
 AVUTIL_LIB:FILEPATH=/usr/lib/x86_64-linux-gnu/libavutil.so
 
 //Path to a program.
