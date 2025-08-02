@@ -1,0 +1,1 @@
+// Paylaşılan Chunk veri yapısı 

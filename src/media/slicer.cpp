@@ -1,0 +1,1 @@
+// Frame'leri chunk'lara bölme 

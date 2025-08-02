@@ -1,0 +1,1 @@
+// Reed-Solomon FEC kodlama/çözme header dosyası 

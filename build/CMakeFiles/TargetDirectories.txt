@@ -1,0 +1,8 @@
+/home/raulcto/CLionProjects/Nova_Engine_V3/build/CMakeFiles/nova_engine.dir
+/home/raulcto/CLionProjects/Nova_Engine_V3/build/CMakeFiles/nova_engine_friend.dir
+/home/raulcto/CLionProjects/Nova_Engine_V3/build/CMakeFiles/udp_test.dir
+/home/raulcto/CLionProjects/Nova_Engine_V3/build/CMakeFiles/udp_test_friend.dir
+/home/raulcto/CLionProjects/Nova_Engine_V3/build/CMakeFiles/udp_chat.dir
+/home/raulcto/CLionProjects/Nova_Engine_V3/build/CMakeFiles/video_chat.dir
+/home/raulcto/CLionProjects/Nova_Engine_V3/build/CMakeFiles/edit_cache.dir
+/home/raulcto/CLionProjects/Nova_Engine_V3/build/CMakeFiles/rebuild_cache.dir

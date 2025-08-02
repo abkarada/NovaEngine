@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/udp_test_friend.dir/src/core/udp_test_friend.cpp.o -o udp_test_friend  -lpthread 

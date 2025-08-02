@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/udp_test.dir/src/core/udp_test.cpp.o -o udp_test  -lpthread 
