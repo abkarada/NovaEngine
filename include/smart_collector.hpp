@@ -91,11 +91,9 @@ private:
     // Background flush thread function
     void flushThread();
     
-    // Check if frame can be reconstructed
+    // Frame reconstruction
     bool canReconstructFrame(const FrameBuffer& buffer) const;
-    
-    // Reconstruct frame from chunks
-    std::vector<uint8_t> reconstructFrame(const FrameBuffer& buffer);
+    std::vector<uint8_t> reconstructFrame(uint32_t frame_id, std::vector<uint8_t>& frame_data);
     
     // Update statistics
     void updateStats(const FrameBuffer& buffer, bool completed);

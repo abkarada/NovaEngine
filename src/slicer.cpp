@@ -1,4 +1,5 @@
 #include "slicer.hpp"
+#include "erasure_coder.hpp"
 #include <algorithm>
 #include <chrono>
 #include <iostream>
@@ -19,50 +20,52 @@ FrameSlicer::FrameSlicer(int chunk_size, int k_chunks, int r_chunks)
 FrameSlicer::~FrameSlicer() {
 }
 
-std::vector<ChunkPacket> FrameSlicer::sliceFrame(const std::vector<uint8_t>& frame_data, 
-                                                uint32_t frame_id, uint64_t timestamp) {
-    auto start_time = std::chrono::high_resolution_clock::now();
-    
-    std::vector<ChunkPacket> chunks;
-    int total_chunks = k_chunks_ + r_chunks_;
-    
-    // Pad data to fit exactly k chunks
-    std::vector<uint8_t> padded_data = padChunk(frame_data, k_chunks_ * chunk_size_);
-    
-    // Create k data chunks
-    for (int i = 0; i < k_chunks_; ++i) {
-        size_t offset = i * chunk_size_;
-        std::vector<uint8_t> chunk_data(padded_data.begin() + offset, 
-                                       padded_data.begin() + offset + chunk_size_);
-        
-        ChunkPacket packet = createChunkPacket(frame_id, i, total_chunks, chunk_data, timestamp);
-        chunks.push_back(packet);
+std::vector<ChunkPacket> FrameSlicer::sliceFrame(const std::vector<uint8_t>& frame_data, uint32_t frame_id) {
+    if (frame_data.empty()) {
+        return {};
     }
     
-    // Create r parity chunks (will be filled by erasure coder)
-    for (int i = k_chunks_; i < total_chunks; ++i) {
-        std::vector<uint8_t> empty_chunk(chunk_size_, 0);
-        ChunkPacket packet = createChunkPacket(frame_id, i, total_chunks, empty_chunk, timestamp);
-        chunks.push_back(packet);
+    auto start_time = std::chrono::high_resolution_clock::now();
+    
+    // Use Reed-Solomon FEC encoding
+    std::vector<std::vector<uint8_t>> fec_chunks;
+    if (!g_erasure_coder || !g_erasure_coder->encode(frame_data, fec_chunks)) {
+        std::cerr << "[Slicer] FEC encoding failed" << std::endl;
+        return {};
+    }
+    
+    std::vector<ChunkPacket> packets;
+    packets.reserve(fec_chunks.size());
+    
+    // Create packets for each FEC chunk
+    for (size_t i = 0; i < fec_chunks.size(); ++i) {
+        ChunkPacket packet;
+        packet.frame_id = frame_id;
+        packet.chunk_id = static_cast<uint16_t>(i);
+        packet.total_chunks = static_cast<uint16_t>(fec_chunks.size());
+        packet.is_parity = (i >= k_chunks_);  // Mark parity chunks
+        packet.timestamp = std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+        packet.path_id = 0;
+        packet.priority = (i < k_chunks_) ? 1 : 0;  // Data chunks have higher priority
+        
+        // Copy data to packet
+        packet.data_size = std::min(static_cast<uint16_t>(fec_chunks[i].size()), 
+                                   static_cast<uint16_t>(sizeof(packet.data)));
+        std::memcpy(packet.data, fec_chunks[i].data(), packet.data_size);
+        
+        packets.push_back(packet);
     }
     
     // Update statistics
     auto end_time = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
     
-    last_stats_.frame_id = frame_id;
-    last_stats_.total_chunks = total_chunks;
-    last_stats_.data_chunks = k_chunks_;
-    last_stats_.parity_chunks = r_chunks_;
-    last_stats_.original_size = frame_data.size();
-    last_stats_.chunked_size = chunks.size() * sizeof(ChunkPacket);
-    last_stats_.slice_time_us = duration.count();
-    
-    std::cout << "[Slicer] Frame " << frame_id << " sliced into " << total_chunks 
+    std::cout << "[Slicer] Frame " << frame_id << " sliced into " << packets.size() 
               << " chunks (" << k_chunks_ << " data + " << r_chunks_ << " parity) in " 
               << duration.count() << "μs" << std::endl;
     
-    return chunks;
+    return packets;
 }
 
 std::vector<uint8_t> FrameSlicer::reconstructFrame(const std::vector<ChunkPacket>& chunks) {
@@ -157,7 +160,7 @@ std::vector<ChunkPacket> sliceFrame(const std::vector<uint8_t>& frame_data,
         throw std::runtime_error("Slicer not initialized");
     }
     
-    return g_slicer->sliceFrame(frame_data, frame_id, timestamp);
+    return g_slicer->sliceFrame(frame_data, frame_id);
 }
 
 void shutdownSlicer() {

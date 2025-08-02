@@ -1,46 +1,31 @@
 # NovaEngine Ultra Stream - Build Instructions
 
-## 🔧 **Düzeltilen Sorunlar**
+## 🔧 **Son Güncellemeler**
 
-### **1. Eksik Include'lar**
-- `#include <ctime>` eklendi (time() fonksiyonu için)
+### **Panel Boyutları Düzeltildi**
+- **640x640 (Square Mode)**: Hem sender hem receiver
+- **Kamera Erişimi**: Otomatik kamera algılama
+- **Test Pattern**: Kamera yoksa fallback
 
-### **2. Null Pointer Kontrolleri**
-- Global değişkenler için null kontrolü eklendi
-- `g_encoder`, `g_scheduler`, `g_collector`, `g_sender_receiver` kontrolleri
-
-### **3. Gereksiz Dosyalar Silindi**
-- `chunk_dispatcher.cpp/hpp` - Artık kullanılmıyor
-- `loss_tracker.cpp/hpp` - Eski implementasyon
-- `rtt_monitor.cpp/hpp` - Eski implementasyon  
-- `ping_handler.cpp/hpp` - Eski implementasyon
-- `ping_sender.cpp/hpp` - Eski implementasyon
-
-### **4. Compiler Warning'leri Düzeltildi**
-- FFmpeg encoder'da narrowing conversion düzeltildi
-- `static_cast<int>(bgrFrame.step)` eklendi
-
-### **5. Overflow Sorunları Düzeltildi**
-- Scheduler'da weight overflow koruması eklendi
-- Weight hesaplama 1-1000 aralığında sınırlandı
+### **Performans İyileştirmeleri**
+- **Boyut Sabitliği**: Frame reconstruction'da tutarlı boyut
+- **Decoder Düzeltmeleri**: H.264 decode hataları giderildi
+- **Copy Optimizasyonu**: Const reference kullanımı
 
 ## 🚀 **Derleme Komutları**
 
 ```bash
+# Kamera erişimi için kullanıcıyı video grubuna ekle
+sudo usermod -a -G video $USER
+newgrp video
+
 # Temiz derleme
-rm -rf build
-mkdir build
-cd build
+cd /home/ryuzaki/Desktop/NovaEngine
+rm -rf build && mkdir build && cd build
+cmake .. && make -j$(nproc)
 
-# CMake konfigürasyonu
-cmake ..
-
-# Derleme
-make -j$(nproc)
-
-# Çalıştırma
-cd ..
-./bin/novaengine sender 127.0.0.1 5001 5002
+# Test
+cd .. && ./bin/novaengine sender 127.0.0.1 5001 5002
 ```
 
 ## 📋 **Gereksinimler**
@@ -68,10 +53,10 @@ newgrp video
 ## ✅ **Test Komutları**
 
 ```bash
-# Sender modu (test pattern)
+# Sender modu (kamera + test pattern)
 ./bin/novaengine sender 127.0.0.1 5001 5002
 
-# Receiver modu (başka terminal)
+# Receiver modu (720x1280 panel)
 ./bin/novaengine receiver 127.0.0.1 5001 5002
 
 # Both modu (hem gönder hem al)
@@ -80,14 +65,16 @@ newgrp video
 
 ## 🎯 **Özellikler**
 
+✅ **640x640 Panel**: Square mode optimizasyonu  
+✅ **Kamera Erişimi**: Otomatik kamera algılama  
 ✅ **Multi-tunnel UDP**: 3 UDP portu üzerinden veri akışı  
 ✅ **MTU-aware slicing**: 1000 byte chunk'lar  
 ✅ **Reed-Solomon FEC**: k=6, r=2 parity  
 ✅ **Adaptive scheduler**: RTT/loss tabanlı path seçimi  
-✅ **Dynamic bitrate**: Network koşullarına göre uyarlama  
+✅ **Dynamic bitrate**: 4Mbps@30fps  
 ✅ **Time-windowed jitter buffer**: <50ms latency  
 ✅ **Zero-copy I/O**: std::move optimizasyonu  
-✅ **Test pattern mode**: Kamera erişimi olmadan test  
+✅ **Boyut Sabitliği**: Tutarlı frame reconstruction  
 
 ## 🔍 **Sorun Giderme**
 
@@ -101,19 +88,20 @@ newgrp video
 sudo reboot
 ```
 
-### **Jerasure Kütüphanesi Bulunamıyor**
-```bash
-sudo apt-get install libjerasure-dev
-```
+### **Panel Boyutları**
+- **Sender**: 640x640 (square)
+- **Receiver**: 640x640 (square)
+- **Test Pattern**: 640x640 (square)
 
-### **FFmpeg Kütüphaneleri Bulunamıyor**
-```bash
-sudo apt-get install libavcodec-dev libavutil-dev libswscale-dev libavformat-dev libswresample-dev
-```
+### **Decoder Hataları**
+- H.264 decode hataları düzeltildi
+- Frame size mismatch kontrolü eklendi
+- Error handling iyileştirildi
 
 ## 📊 **Performans Hedefleri**
 
-- **Latency**: <100ms (Zoom'dan daha hızlı)
+- **Latency**: <50ms
 - **Reliability**: Zero packet loss (FEC ile)
-- **Quality**: Netflix kalitesinde dinamik sıkıştırma
-- **Throughput**: Multi-tunnel ile maksimum bant genişliği 
+- **Quality**: 4Mbps@30fps (640x640)
+- **Throughput**: 20+ Mbps
+- **Panel Boyutu**: 640x640 (tutarlı) 

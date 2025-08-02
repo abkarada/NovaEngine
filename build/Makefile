@@ -225,6 +225,30 @@ src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/network_monitor.o: src/network_monitor.cpp.o
+.PHONY : src/network_monitor.o
+
+# target to build an object file
+src/network_monitor.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/network_monitor.cpp.o
+.PHONY : src/network_monitor.cpp.o
+
+src/network_monitor.i: src/network_monitor.cpp.i
+.PHONY : src/network_monitor.i
+
+# target to preprocess a source file
+src/network_monitor.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/network_monitor.cpp.i
+.PHONY : src/network_monitor.cpp.i
+
+src/network_monitor.s: src/network_monitor.cpp.s
+.PHONY : src/network_monitor.s
+
+# target to generate assembly for a file
+src/network_monitor.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/novaengine.dir/build.make CMakeFiles/novaengine.dir/src/network_monitor.cpp.s
+.PHONY : src/network_monitor.cpp.s
+
 src/scheduler.o: src/scheduler.cpp.o
 .PHONY : src/scheduler.o
 
@@ -366,6 +390,9 @@ help:
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/network_monitor.o"
+	@echo "... src/network_monitor.i"
+	@echo "... src/network_monitor.s"
 	@echo "... src/scheduler.o"
 	@echo "... src/scheduler.i"
 	@echo "... src/scheduler.s"

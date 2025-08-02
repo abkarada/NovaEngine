@@ -13,20 +13,18 @@ class H264Decoder {
 public:
     H264Decoder();
     ~H264Decoder();
-
-    // Yeni frame decode edildiğinde true döner
+    
+    bool init();
     bool decode(const std::vector<uint8_t>& encoded_data, cv::Mat& output_frame);
-
-private:
-    AVCodec* codec = nullptr;
-    AVCodecContext* codec_ctx = nullptr;
-    AVFrame* frame = nullptr;
-    AVPacket* packet = nullptr;
-    SwsContext* sws_ctx = nullptr;
-
-    int width = 1280;
-    int height = 720;
-
-    void init();
     void cleanup();
+    
+private:
+    bool convertFrameToOpenCV(AVFrame* frame, cv::Mat& output_frame);
+    
+    AVCodec* codec;
+    AVCodecContext* codec_ctx;
+    AVPacket* packet;
+    AVFrame* frame;
+    struct SwsContext* sws_ctx;
+    bool initialized;
 };

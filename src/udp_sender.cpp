@@ -21,14 +21,7 @@ static std::vector<int> global_sockets;
 static bool global_sockets_initialized = false;
 static std::function<void(const ChunkPacket&, int)> global_receive_callback = nullptr;
 
-// PathStats implementation
-PathStats::PathStats(const std::string& ip, int port, double rtt, double loss)
-    : ip(ip), port(port), rtt_ms(rtt), loss_ratio(loss), 
-      bytes_sent(0), packets_sent(0), last_activity(0) {
-    // Calculate weight based on RTT and loss
-    double score = 1000.0 / (rtt + 1.0) * (1.0 - loss);
-    weight = std::max(1, static_cast<int>(score));
-}
+// PathStats implementation - constructor is already defined in header
 
 // UDPSender implementation
 UDPSender::UDPSender() : running_(false) {

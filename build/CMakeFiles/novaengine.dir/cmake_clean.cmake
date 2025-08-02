@@ -9,6 +9,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/novaengine.dir/src/ffmpeg_encoder.cpp.o.d"
   "CMakeFiles/novaengine.dir/src/main.cpp.o"
   "CMakeFiles/novaengine.dir/src/main.cpp.o.d"
+  "CMakeFiles/novaengine.dir/src/network_monitor.cpp.o"
+  "CMakeFiles/novaengine.dir/src/network_monitor.cpp.o.d"
   "CMakeFiles/novaengine.dir/src/scheduler.cpp.o"
   "CMakeFiles/novaengine.dir/src/scheduler.cpp.o.d"
   "CMakeFiles/novaengine.dir/src/sender_receiver.cpp.o"

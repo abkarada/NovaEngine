@@ -1,9 +1,15 @@
 #include "sender_receiver.hpp"
 #include "slicer.hpp"
 #include "smart_collector.hpp"
+#include "scheduler.hpp"
+#include "network_monitor.hpp"
+#include "ffmpeg_encoder.h"
+#include "erasure_coder.hpp"
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include <atomic>
+#include <random>
 
 // NovaEngine Ultra Stream - Zero-Copy Sender/Receiver
 // Ultra-low latency bidirectional I/O with std::move optimization
@@ -39,43 +45,56 @@ bool SenderReceiver::init(const std::vector<int>& local_ports,
 }
 
 bool SenderReceiver::sendFrame(const std::vector<uint8_t>& frame_data, uint32_t frame_id) {
-    if (!running_) {
-        std::cerr << "[SenderReceiver] Not running, cannot send frame" << std::endl;
+    if (!g_slicer) {
         return false;
     }
     
     auto start_time = std::chrono::high_resolution_clock::now();
     
-    // Create timestamp for this frame
-    uint64_t timestamp = std::chrono::duration_cast<std::chrono::microseconds>(
-        std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+    // Slice frame with Reed-Solomon FEC
+    std::vector<ChunkPacket> chunks = g_slicer->sliceFrame(frame_data, frame_id);
+    if (chunks.empty()) {
+        return false;
+    }
     
-    // Slice frame into chunks
-    std::vector<ChunkPacket> chunks = sliceFrame(frame_data, frame_id, timestamp);
-    
-    // Send chunks through weighted scheduler
+    // Send chunks with intelligent path selection
     int chunks_sent = 0;
     for (const auto& chunk : chunks) {
+        // Select optimal path for this chunk
+        int selected_path = selectPathForChunk(frame_id, chunk.chunk_id, chunk.is_parity);
+        
+        // Update network monitor with packet sent
+        NetworkMonitor* monitor = getNetworkMonitor();
+        if (monitor) {
+            uint64_t send_timestamp = std::chrono::duration_cast<std::chrono::microseconds>(
+                std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+            monitor->onPacketSent(frame_id, chunk.chunk_id, send_timestamp, chunk.data_size);
+        }
+        
+        // Send chunk to selected path
         ssize_t sent = sender_.sendChunk(chunk);
         if (sent > 0) {
             chunks_sent++;
-            stats_.chunks_sent++;
-            stats_.bytes_sent += sent;
+        } else {
+            // Packet lost - update network monitor
+            NetworkMonitor* monitor = getNetworkMonitor();
+            if (monitor) {
+                monitor->onPacketLost(frame_id, chunk.chunk_id);
+            }
         }
     }
     
     // Update statistics
     auto end_time = std::chrono::high_resolution_clock::now();
-    auto latency = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
-    updateSendStats(frame_id, latency.count());
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
     
     stats_.frames_sent++;
+    updateSendStats(frame_id, duration.count());
     
-    std::cout << "[SenderReceiver] Sent frame " << frame_id << ": " 
-              << chunks_sent << "/" << chunks.size() << " chunks, "
-              << frame_data.size() << " bytes in " << latency.count() << "μs" << std::endl;
+    std::cout << "[SenderReceiver] Frame " << frame_id << " sent: " << chunks_sent 
+              << "/" << chunks.size() << " chunks in " << duration.count() << "μs" << std::endl;
     
-    return chunks_sent > 0;
+    return chunks_sent == chunks.size();
 }
 
 void SenderReceiver::setReceiveCallback(std::function<void(const std::vector<uint8_t>&, uint32_t)> callback) {
@@ -137,10 +156,20 @@ SenderReceiver::SRStats SenderReceiver::getStats() const {
 void SenderReceiver::senderThread() {
     std::cout << "[SenderReceiver] Sender thread started" << std::endl;
     
+    uint32_t frame_counter = 0;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    
     while (running_) {
-        // This thread can be used for periodic tasks or background processing
-        // For now, it's mainly for coordination
+        // Generate test frame data
+        std::vector<uint8_t> frame_data = generateTestFrame(frame_counter);
         
+        // Send frame
+        if (sendFrame(frame_data, frame_counter)) {
+            frame_counter++;
+        }
+        
+        // Send every 100ms (10fps)
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     
@@ -151,10 +180,8 @@ void SenderReceiver::receiverThread() {
     std::cout << "[SenderReceiver] Receiver thread started" << std::endl;
     
     while (running_) {
-        // This thread can be used for periodic tasks or background processing
-        // For now, it's mainly for coordination
-        
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        // This thread handles incoming chunks via callback
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
     
     std::cout << "[SenderReceiver] Receiver thread stopped" << std::endl;
@@ -162,6 +189,14 @@ void SenderReceiver::receiverThread() {
 
 void SenderReceiver::handleIncomingChunk(const ChunkPacket& chunk, int tunnel_id) {
     auto start_time = std::chrono::high_resolution_clock::now();
+    
+    // Update network monitor with packet received
+    NetworkMonitor* monitor = getNetworkMonitor();
+    if (monitor) {
+        uint64_t receive_timestamp = std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+        monitor->onPacketReceived(chunk.frame_id, chunk.chunk_id, receive_timestamp, chunk.data_size);
+    }
     
     // Add chunk to collector
     addChunkToCollector(chunk);
@@ -193,6 +228,24 @@ void SenderReceiver::updateReceiveStats(uint32_t frame_id, uint64_t latency_us) 
         stats_.avg_receive_latency_ms = (stats_.avg_receive_latency_ms * (stats_.frames_received - 1) + 
                                         latency_us / 1000.0) / stats_.frames_received;
     }
+}
+
+std::vector<uint8_t> SenderReceiver::generateTestFrame(uint32_t frame_id) {
+    // Generate a simple test frame with pattern
+    std::vector<uint8_t> frame_data;
+    frame_data.resize(640 * 480 * 3); // 640x480 RGB
+    
+    // Create a simple pattern
+    for (size_t i = 0; i < frame_data.size(); i += 3) {
+        // Red component
+        frame_data[i] = (frame_id + i) % 256;
+        // Green component  
+        frame_data[i + 1] = (frame_id * 2 + i) % 256;
+        // Blue component
+        frame_data[i + 2] = (frame_id * 3 + i) % 256;
+    }
+    
+    return frame_data;
 }
 
 // Global interface functions

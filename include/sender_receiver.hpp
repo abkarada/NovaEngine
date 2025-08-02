@@ -68,6 +68,9 @@ private:
     // Update statistics
     void updateSendStats(uint32_t frame_id, uint64_t latency_us);
     void updateReceiveStats(uint32_t frame_id, uint64_t latency_us);
+    
+    // Generate test frame data
+    std::vector<uint8_t> generateTestFrame(uint32_t frame_id);
 };
 
 // Global sender/receiver interface

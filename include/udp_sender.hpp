@@ -15,11 +15,12 @@ struct ChunkPacket {
     uint32_t frame_id;           // Frame identifier
     uint16_t chunk_id;           // Chunk index within frame
     uint16_t total_chunks;       // Total chunks in frame
-    uint16_t data_size;          // Actual data size
-    uint8_t data[1000];          // MTU-optimized payload
     uint64_t timestamp;          // High-precision timestamp
     uint8_t path_id;             // Which UDP tunnel used
     uint8_t priority;            // Priority level (0=normal, 1=high, 2=critical)
+    bool is_parity;  // True if this is a parity chunk
+    uint16_t data_size;          // Actual data size
+    uint8_t data[1000];          // MTU-optimized payload
 };
 
 // Path statistics for adaptive scheduling
@@ -28,12 +29,14 @@ struct PathStats {
     int port;
     double rtt_ms;              // Round-trip time
     double loss_ratio;          // Packet loss ratio
+    double throughput_mbps;     // Throughput in Mbps
     int weight;                 // Calculated weight for scheduler
     uint64_t bytes_sent;        // Total bytes sent
     uint64_t packets_sent;      // Total packets sent
     uint64_t last_activity;     // Last activity timestamp
     
-    PathStats(const std::string& ip, int port, double rtt = 50.0, double loss = 0.0);
+    PathStats(const std::string& ip, int port, double rtt = 50.0, double loss = 0.0, double throughput = 10.0)
+        : ip(ip), port(port), rtt_ms(rtt), loss_ratio(loss), throughput_mbps(throughput) {}
 };
 
 // Multi-tunnel UDP sender with bidirectional I/O

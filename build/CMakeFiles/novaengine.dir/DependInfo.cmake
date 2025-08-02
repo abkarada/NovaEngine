@@ -12,6 +12,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/ryuzaki/Desktop/NovaEngine/src/erasure_coder.cpp" "CMakeFiles/novaengine.dir/src/erasure_coder.cpp.o" "gcc" "CMakeFiles/novaengine.dir/src/erasure_coder.cpp.o.d"
   "/home/ryuzaki/Desktop/NovaEngine/src/ffmpeg_encoder.cpp" "CMakeFiles/novaengine.dir/src/ffmpeg_encoder.cpp.o" "gcc" "CMakeFiles/novaengine.dir/src/ffmpeg_encoder.cpp.o.d"
   "/home/ryuzaki/Desktop/NovaEngine/src/main.cpp" "CMakeFiles/novaengine.dir/src/main.cpp.o" "gcc" "CMakeFiles/novaengine.dir/src/main.cpp.o.d"
+  "/home/ryuzaki/Desktop/NovaEngine/src/network_monitor.cpp" "CMakeFiles/novaengine.dir/src/network_monitor.cpp.o" "gcc" "CMakeFiles/novaengine.dir/src/network_monitor.cpp.o.d"
   "/home/ryuzaki/Desktop/NovaEngine/src/scheduler.cpp" "CMakeFiles/novaengine.dir/src/scheduler.cpp.o" "gcc" "CMakeFiles/novaengine.dir/src/scheduler.cpp.o.d"
   "/home/ryuzaki/Desktop/NovaEngine/src/sender_receiver.cpp" "CMakeFiles/novaengine.dir/src/sender_receiver.cpp.o" "gcc" "CMakeFiles/novaengine.dir/src/sender_receiver.cpp.o.d"
   "/home/ryuzaki/Desktop/NovaEngine/src/slicer.cpp" "CMakeFiles/novaengine.dir/src/slicer.cpp.o" "gcc" "CMakeFiles/novaengine.dir/src/slicer.cpp.o.d"

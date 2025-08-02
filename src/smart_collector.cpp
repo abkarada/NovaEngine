@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <iostream>
 #include <chrono>
+#include <cstring>
 
 // NovaEngine Ultra Stream - Time-Windowed Jitter Buffer
 // <50ms latency with intelligent frame reconstruction
@@ -46,7 +47,7 @@ void SmartCollector::addChunk(const ChunkPacket& chunk) {
     // Add chunk to buffer
     if (chunk.chunk_id < buffer.total_chunks) {
         std::vector<uint8_t> chunk_data(chunk.data, chunk.data + chunk.data_size);
-        buffer.chunks[chunk.chunk_id] = std::move(chunk_data);
+        buffer.chunks[chunk.chunk_id] = chunk_data;
         buffer.chunk_received[chunk.chunk_id] = true;
         buffer.received_chunks++;
         
@@ -68,7 +69,8 @@ std::vector<uint8_t> SmartCollector::getCompleteFrame(uint32_t frame_id) {
     FrameBuffer& buffer = it->second;
     
     if (canReconstructFrame(buffer)) {
-        std::vector<uint8_t> frame_data = reconstructFrame(buffer);
+        std::vector<uint8_t> frame_data;
+        reconstructFrame(frame_id, frame_data);
         
         // Remove frame from buffer
         frame_buffers_.erase(it);
@@ -186,7 +188,8 @@ void SmartCollector::flushThread() {
             
             for (auto it = frame_buffers_.begin(); it != frame_buffers_.end();) {
                 if (canReconstructFrame(it->second)) {
-                    std::vector<uint8_t> frame_data = reconstructFrame(it->second);
+                    std::vector<uint8_t> frame_data;
+                    reconstructFrame(it->first, frame_data);
                     completed_frames.emplace_back(it->first, std::move(frame_data));
                     
                     updateStats(it->second, true);
@@ -217,21 +220,64 @@ bool SmartCollector::canReconstructFrame(const FrameBuffer& buffer) const {
     return buffer.received_chunks >= k_chunks_;
 }
 
-std::vector<uint8_t> SmartCollector::reconstructFrame(const FrameBuffer& buffer) {
-    std::vector<uint8_t> frame_data;
+std::vector<uint8_t> SmartCollector::reconstructFrame(uint32_t frame_id, std::vector<uint8_t>& frame_data) {
+    auto it = frame_buffers_.find(frame_id);
+    if (it == frame_buffers_.end()) {
+        return {};
+    }
     
-    // Reconstruct from data chunks only
-    for (int i = 0; i < k_chunks_; ++i) {
-        if (buffer.chunk_received[i]) {
-            frame_data.insert(frame_data.end(), 
-                             buffer.chunks[i].begin(), 
-                             buffer.chunks[i].end());
+    FrameBuffer& buffer = it->second;
+    
+    // Check if we have enough chunks for reconstruction
+    if (buffer.chunks.size() < k_chunks_) {
+        return {};
+    }
+    
+    // Separate data and parity chunks
+    std::vector<std::vector<uint8_t>> data_chunks;
+    std::vector<std::vector<uint8_t>> parity_chunks;
+    
+    for (size_t i = 0; i < buffer.chunks.size(); i++) {
+        if (i < k_chunks_) {
+            data_chunks.push_back(buffer.chunks[i]);
+        } else {
+            parity_chunks.push_back(buffer.chunks[i]);
         }
     }
     
-    std::cout << "[Collector] Reconstructed frame " << buffer.frame_id 
-              << " from " << buffer.received_chunks << "/" << buffer.total_chunks 
-              << " chunks (" << frame_data.size() << " bytes)" << std::endl;
+    // If we have all data chunks, no need for FEC decode
+    if (data_chunks.size() == k_chunks_) {
+        // Concatenate data chunks
+        frame_data.clear();
+        for (const auto& chunk : data_chunks) {
+            frame_data.insert(frame_data.end(), chunk.begin(), chunk.end());
+        }
+        
+        // Remove padding (last chunk might be padded)
+        if (!frame_data.empty()) {
+            // Find the last non-zero byte to determine actual size
+            size_t actual_size = frame_data.size();
+            while (actual_size > 0 && frame_data[actual_size - 1] == 0) {
+                actual_size--;
+            }
+            frame_data.resize(actual_size);
+        }
+        
+        std::cout << "[Collector] Reconstructed frame " << frame_id 
+                  << " from " << data_chunks.size() << "/" << k_chunks_ << " data chunks (" 
+                  << frame_data.size() << " bytes)" << std::endl;
+        return frame_data;
+    }
+    
+    // For now, just concatenate available data chunks
+    frame_data.clear();
+    for (const auto& chunk : data_chunks) {
+        frame_data.insert(frame_data.end(), chunk.begin(), chunk.end());
+    }
+    
+    std::cout << "[Collector] Partial reconstruction frame " << frame_id 
+              << " from " << data_chunks.size() << "/" << k_chunks_ << " data chunks (" 
+              << frame_data.size() << " bytes)" << std::endl;
     
     return frame_data;
 }
@@ -239,11 +285,17 @@ std::vector<uint8_t> SmartCollector::reconstructFrame(const FrameBuffer& buffer)
 void SmartCollector::updateStats(const FrameBuffer& buffer, bool completed) {
     if (completed) {
         stats_.frames_completed++;
+        
+        // Calculate latency only for completed frames
+        double latency = calculateLatency(buffer);
+        if (latency >= 0) {  // Only update if latency is valid
+            if (stats_.frames_completed == 1) {
+                stats_.avg_latency_ms = latency;
+            } else {
+                stats_.avg_latency_ms = (stats_.avg_latency_ms * (stats_.frames_completed - 1) + latency) / stats_.frames_completed;
+            }
+        }
     }
-    
-    // Calculate latency
-    double latency = calculateLatency(buffer);
-    stats_.avg_latency_ms = (stats_.avg_latency_ms * (stats_.frames_completed - 1) + latency) / stats_.frames_completed;
 }
 
 double SmartCollector::calculateLatency(const FrameBuffer& buffer) const {

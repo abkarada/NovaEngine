@@ -12,9 +12,8 @@ public:
     FrameSlicer(int chunk_size = 1000, int k_chunks = 6, int r_chunks = 2);
     ~FrameSlicer();
     
-    // Slice encoded frame into k+r chunks for FEC
-    std::vector<ChunkPacket> sliceFrame(const std::vector<uint8_t>& frame_data, 
-                                       uint32_t frame_id, uint64_t timestamp);
+    // Slice frame into chunks with Reed-Solomon FEC
+    std::vector<ChunkPacket> sliceFrame(const std::vector<uint8_t>& frame_data, uint32_t frame_id);
     
     // Reconstruct frame from chunks (after FEC decode)
     std::vector<uint8_t> reconstructFrame(const std::vector<ChunkPacket>& chunks);

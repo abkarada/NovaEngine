@@ -51,8 +51,27 @@ public:
     
     EncoderStats getStats() const;
     
-    // Auto-adapt bitrate based on network conditions
-    void adaptBitrate(double network_kbps, double loss_ratio);
+    // Adaptive bitrate control
+    void adaptBitrate(double network_kbps, double loss_ratio, double rtt_ms);
+    
+    // Get optimal bitrate based on network conditions
+    int calculateOptimalBitrate(double network_kbps, double loss_ratio, double rtt_ms) const;
+    
+    // Get optimal FPS based on network conditions
+    int calculateOptimalFPS(double network_kbps, double loss_ratio) const;
+    
+    // Get optimal encoder parameters
+    struct EncoderParams {
+        int bitrate_kbps;
+        int fps;
+        int crf;
+        std::string preset;
+        int keyint;
+        int refs;
+        bool low_latency;
+    };
+    
+    EncoderParams calculateOptimalParams(double network_kbps, double loss_ratio, double rtt_ms) const;
     
     // Get current encoding parameters
     int getCurrentBitrate() const { return current_bitrate_; }
@@ -107,5 +126,5 @@ extern FFmpegEncoder* g_encoder;
 void initEncoder(int width = 1280, int height = 720, int fps = 30, int bitrate = 3000);
 bool encodeFrame(const cv::Mat& frame, std::vector<uint8_t>& data);
 void setEncoderBitrate(int bitrate_kbps);
-void adaptEncoderToNetwork(double network_kbps, double loss_ratio);
+void adaptEncoderToNetwork(double network_kbps, double loss_ratio, double rtt_ms);
 void shutdownEncoder();

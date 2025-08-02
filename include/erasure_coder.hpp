@@ -12,12 +12,9 @@ public:
     ErasureCoder(int k_chunks = 6, int r_chunks = 2, int chunk_size = 1000);
     ~ErasureCoder();
     
-    // Encode data into k+r chunks with Reed-Solomon FEC
-    std::vector<std::vector<uint8_t>> encode(const std::vector<uint8_t>& data);
-    
-    // Decode data from available chunks (minimum k required)
-    std::vector<uint8_t> decode(const std::vector<std::vector<uint8_t>>& chunks,
-                               const std::vector<bool>& chunk_available);
+    // Main encoding/decoding functions
+    bool encode(const std::vector<uint8_t>& data, std::vector<std::vector<uint8_t>>& chunks);
+    bool decode(const std::vector<std::vector<uint8_t>>& chunks, std::vector<uint8_t>& data);
     
     // Check if frame can be decoded with available chunks
     bool canDecode(const std::vector<bool>& chunk_available) const;
