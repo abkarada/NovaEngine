@@ -121,11 +121,15 @@ struct FrameBuffer {
         vector<uint8_t> frame_data;
         if (decode_result == 0) {
             // Successfully decoded, reconstruct frame
+            cout << "[FEC] Successfully decoded frame " << frame_id << endl;
             for (int i = 0; i < K_CHUNKS; ++i) {
                 frame_data.insert(frame_data.end(), 
                                 reinterpret_cast<uint8_t*>(data_ptrs[i]),
                                 reinterpret_cast<uint8_t*>(data_ptrs[i]) + CHUNK_SIZE);
             }
+            cout << "[FEC] Reconstructed frame size: " << frame_data.size() << " bytes" << endl;
+        } else {
+            cout << "[FEC] Failed to decode frame " << frame_id << " (result: " << decode_result << ")" << endl;
         }
         
         // Cleanup
@@ -206,15 +210,19 @@ void udp_send_thread(const string& target_ip, int target_port, int local_port) {
     cout << "[SENDER] Starting sender thread on port " << local_port << endl;
     
     // Setup camera
-    VideoCapture cap(0, CAP_V4L2);
+    VideoCapture cap(0); // Try default camera first
     if (!cap.isOpened()) {
-        cerr << "[SENDER] Failed to open camera" << endl;
-        return;
+        cap.open(1); // Try second camera
     }
-    
-    cap.set(CAP_PROP_FRAME_WIDTH, 640);
-    cap.set(CAP_PROP_FRAME_HEIGHT, 480);
-    cap.set(CAP_PROP_FPS, 30);
+    if (!cap.isOpened()) {
+        cerr << "[SENDER] Failed to open camera. Trying without camera..." << endl;
+        // Continue without camera for testing
+    } else {
+        cap.set(CAP_PROP_FRAME_WIDTH, 640);
+        cap.set(CAP_PROP_FRAME_HEIGHT, 480);
+        cap.set(CAP_PROP_FPS, 30);
+        cout << "[SENDER] Camera opened successfully" << endl;
+    }
     
     // Setup encoder
     FFmpegEncoder encoder(640, 480, 30, 600000);
@@ -229,8 +237,15 @@ void udp_send_thread(const string& target_ip, int target_port, int local_port) {
     Mat frame;
     
     while (running) {
-        cap.read(frame);
-        if (frame.empty()) continue;
+        if (cap.isOpened()) {
+            cap.read(frame);
+            if (frame.empty()) continue;
+        } else {
+            // Generate test frame if no camera
+            frame = Mat(480, 640, CV_8UC3, Scalar(0, 255, 0)); // Green frame
+            putText(frame, "Test Frame " + to_string(frame_id), Point(50, 240), 
+                   FONT_HERSHEY_SIMPLEX, 2, Scalar(255, 255, 255), 3);
+        }
         
         // Encode frame
         vector<uint8_t> encoded_data;
@@ -288,6 +303,8 @@ void udp_send_thread(const string& target_ip, int target_port, int local_port) {
             
             if (sent < 0) {
                 cerr << "[SENDER] Send failed: " << strerror(errno) << endl;
+            } else {
+                cout << "[SENDER] Sent frame " << frame_id << " chunk " << i << "/" << TOTAL_CHUNKS << endl;
             }
         }
         
@@ -327,6 +344,8 @@ void udp_receive_thread() {
         if (received == sizeof(VideoPacket)) {
             VideoPacket* pkt = reinterpret_cast<VideoPacket*>(recv_buffer);
             
+            cout << "[RECEIVER] Received frame " << pkt->frame_id << " chunk " << (int)pkt->chunk_id << "/" << (int)pkt->total_chunks << endl;
+            
             // Extract chunk data
             vector<uint8_t> chunk_data(pkt->data, pkt->data + CHUNK_SIZE);
             
@@ -335,12 +354,36 @@ void udp_receive_thread() {
             
             // Check if frame is complete
             if (frame_buffer.can_decode_frame(pkt->frame_id)) {
+                cout << "[RECEIVER] Frame " << pkt->frame_id << " ready for FEC decode" << endl;
                 auto frame_data = frame_buffer.decode_frame(pkt->frame_id);
                 
+                cout << "[RECEIVER] Frame data size: " << frame_data.size() << " bytes" << endl;
+                
                 // Decode frame
-                if (decoder.decode(frame_data, decoded_frame)) {
+                if (!frame_data.empty() && decoder.decode(frame_data, decoded_frame)) {
+                    // Create split screen display
+                    Mat display_frame(480, 1280, CV_8UC3); // 1280x480 for split screen
+                    
+                    // Left side: Local camera (placeholder)
+                    Mat left_side = display_frame.colRange(0, 640);
+                    left_side.setTo(Scalar(0, 0, 0)); // Black background
+                    putText(left_side, "Local Camera", Point(200, 240), 
+                           FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 255, 255), 2);
+                    
+                    // Right side: Remote video
+                    if (!decoded_frame.empty()) {
+                        Mat resized_remote;
+                        cv::resize(decoded_frame, resized_remote, cv::Size(640, 480));
+                        resized_remote.copyTo(display_frame.colRange(640, 1280));
+                    } else {
+                        Mat right_side = display_frame.colRange(640, 1280);
+                        right_side.setTo(Scalar(0, 0, 0));
+                        putText(right_side, "Remote Camera", Point(200, 240), 
+                               FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 255, 255), 2);
+                    }
+                    
                     // Display frame
-                    imshow("NovaEngine - Receiver", decoded_frame);
+                    imshow("NovaEngine - Split Screen", display_frame);
                     if (waitKey(1) == 27) { // ESC key
                         running = false;
                         break;
@@ -403,3 +446,4 @@ int main(int argc, char* argv[]) {
     cout << "NovaEngine stopped" << endl;
     return 0;
 }
+
